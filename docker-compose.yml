@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  target-app:
+    build:
+      context: ./target_app
+      dockerfile: Dockerfile
+    container_name: performance-target-app
+    ports:
+      - "8001:8001"
+    networks:
+      - perf-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: performance-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - NVIDIA_API_KEY=${NVIDIA_API_KEY}
+      - NVIDIA_BASE_URL=${NVIDIA_BASE_URL:-https://integrate.api.nvidia.com/v1}
+      - TARGET_APP_URL=http://target-app:8001
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./test_runs:/app/test_runs
+      - ./backend/data:/app/data
+    depends_on:
+      target-app:
+        condition: service_healthy
+    networks:
+      - perf-net
+    restart: unless-stopped
+
+networks:
+  perf-net:
+    driver: bridge

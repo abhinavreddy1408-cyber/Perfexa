@@ -1,0 +1,215 @@
+{
+  "$defs": {
+    "EndpointConfig": {
+      "properties": {
+        "path": {
+          "description": "API endpoint path, e.g. '/api/login' or '/api/heavy'",
+          "title": "Path",
+          "type": "string"
+        },
+        "method": {
+          "default": "GET",
+          "description": "HTTP method",
+          "enum": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "PATCH"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "headers": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "HTTP request headers",
+          "title": "Headers",
+          "type": "object"
+        },
+        "payload_template": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "JSON payload body with realistic dummy data or tokens",
+          "title": "Payload Template"
+        },
+        "weight": {
+          "default": 100,
+          "description": "Traffic weight distribution if multiple endpoints are specified",
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Weight",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "EndpointConfig",
+      "type": "object"
+    },
+    "RampStage": {
+      "properties": {
+        "duration": {
+          "description": "Duration for this stage, e.g., '10s', '1m', '30s'",
+          "title": "Duration",
+          "type": "string"
+        },
+        "target_vus": {
+          "description": "Target virtual users at the end of this stage",
+          "minimum": 0,
+          "title": "Target Vus",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "duration",
+        "target_vus"
+      ],
+      "title": "RampStage",
+      "type": "object"
+    },
+    "SuccessCriteria": {
+      "properties": {
+        "p95_ms": {
+          "default": 500,
+          "description": "Maximum acceptable 95th percentile response time in milliseconds",
+          "exclusiveMinimum": 0,
+          "title": "P95 Ms",
+          "type": "integer"
+        },
+        "max_error_rate": {
+          "default": 0.01,
+          "description": "Maximum acceptable error rate as a decimal (e.g. 0.01 = 1%, 0.05 = 5%)",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Max Error Rate",
+          "type": "number"
+        },
+        "p99_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 1000,
+          "description": "Maximum acceptable 99th percentile response time in milliseconds",
+          "title": "P99 Ms"
+        }
+      },
+      "title": "SuccessCriteria",
+      "type": "object"
+    },
+    "TestIntent": {
+      "properties": {
+        "test_type": {
+          "description": "Type of test: 'baseline' (steady low load), 'soak' (moderate load over longer duration), or 'stress' (ramping load to find breaking point)",
+          "enum": [
+            "baseline",
+            "soak",
+            "stress"
+          ],
+          "title": "Test Type",
+          "type": "string"
+        },
+        "target_url": {
+          "default": "http://localhost:8001",
+          "description": "Target application base URL",
+          "title": "Target Url",
+          "type": "string"
+        },
+        "virtual_users": {
+          "description": "Peak or steady virtual users (concurrent threads)",
+          "exclusiveMinimum": 0,
+          "title": "Virtual Users",
+          "type": "integer"
+        },
+        "duration": {
+          "description": "Overall test duration or steady period, e.g. '30s', '2m', '5m'",
+          "title": "Duration",
+          "type": "string"
+        },
+        "ramp_pattern": {
+          "description": "Stages for ramping VUs up, holding, and ramping down",
+          "items": {
+            "$ref": "#/$defs/RampStage"
+          },
+          "title": "Ramp Pattern",
+          "type": "array"
+        },
+        "endpoints_involved": {
+          "description": "List of endpoints targeted during the load test",
+          "items": {
+            "$ref": "#/$defs/EndpointConfig"
+          },
+          "minItems": 1,
+          "title": "Endpoints Involved",
+          "type": "array"
+        },
+        "success_criteria": {
+          "$ref": "#/$defs/SuccessCriteria",
+          "description": "Pass/fail thresholds for latency and error rates"
+        },
+        "assumptions_made": {
+          "description": "Explicit assumptions made when interpreting vague or unspecified prompt details",
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions Made",
+          "type": "array"
+        },
+        "summary_description": {
+          "description": "Concise plain-English summary of the extracted intent",
+          "title": "Summary Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "test_type",
+        "virtual_users",
+        "duration",
+        "endpoints_involved",
+        "summary_description"
+      ],
+      "title": "TestIntent",
+      "type": "object"
+    }
+  },
+  "description": "Unified response model for Step 4 merged LLM call.\nContains both the structured intent and the generated synthetic payloads.",
+  "properties": {
+    "intent": {
+      "$ref": "#/$defs/TestIntent",
+      "description": "Structured test intent"
+    },
+    "synthetic_payloads": {
+      "additionalProperties": {
+        "items": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "description": "Dictionary mapping endpoint path to a pool of realistic synthetic payloads",
+      "title": "Synthetic Payloads",
+      "type": "object"
+    }
+  },
+  "required": [
+    "intent"
+  ],
+  "title": "MergedIntentPayloadResponse",
+  "type": "object"
+}

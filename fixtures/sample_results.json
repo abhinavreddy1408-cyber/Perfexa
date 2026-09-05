@@ -1,0 +1,127 @@
+{
+  "total_requests": 1071,
+  "failed_requests": 1021,
+  "error_rate": 0.9533,
+  "error_percentage": 95.33,
+  "p50_ms": 2509.81,
+  "p95_ms": 2527.51,
+  "p99_ms": 2558.97,
+  "avg_latency_ms": 2310.75,
+  "avg_rps": 69.41,
+  "total_duration_sec": 15.43,
+  "passed": false,
+  "threshold_failures": [
+    "p95 latency (2527.51ms) exceeded limit (200ms)",
+    "Error rate (95.3%) exceeded limit (10.0%)"
+  ],
+  "chart_history": [
+    {
+      "time": "0.7s",
+      "vus": 0,
+      "rps": 25.0,
+      "error_rate": 0.0,
+      "p95_ms": 154.41,
+      "p50_ms": 131.35
+    },
+    {
+      "time": "2.0s",
+      "vus": 200,
+      "rps": 54.0,
+      "error_rate": 0.537,
+      "p95_ms": 1602.08,
+      "p50_ms": 619.04
+    },
+    {
+      "time": "3.2s",
+      "vus": 200,
+      "rps": 90.5,
+      "error_rate": 0.8,
+      "p95_ms": 2559.3,
+      "p50_ms": 2504.79
+    },
+    {
+      "time": "4.5s",
+      "vus": 200,
+      "rps": 88.0,
+      "error_rate": 0.8366,
+      "p95_ms": 2559.3,
+      "p50_ms": 2511.33
+    },
+    {
+      "time": "5.8s",
+      "vus": 200,
+      "rps": 96.5,
+      "error_rate": 0.8889,
+      "p95_ms": 2519.48,
+      "p50_ms": 2504.14
+    },
+    {
+      "time": "7.0s",
+      "vus": 200,
+      "rps": 82.5,
+      "error_rate": 0.8975,
+      "p95_ms": 2519.48,
+      "p50_ms": 2504.54
+    },
+    {
+      "time": "8.3s",
+      "vus": 200,
+      "rps": 75.0,
+      "error_rate": 0.9167,
+      "p95_ms": 2519.48,
+      "p50_ms": 2509.53
+    },
+    {
+      "time": "9.5s",
+      "vus": 200,
+      "rps": 83.0,
+      "error_rate": 0.9271,
+      "p95_ms": 2515.21,
+      "p50_ms": 2510.14
+    },
+    {
+      "time": "10.8s",
+      "vus": 200,
+      "rps": 49.0,
+      "error_rate": 0.9332,
+      "p95_ms": 2516.05,
+      "p50_ms": 2510.67
+    },
+    {
+      "time": "12.1s",
+      "vus": 200,
+      "rps": 86.0,
+      "error_rate": 0.9431,
+      "p95_ms": 2517.64,
+      "p50_ms": 2514.0
+    },
+    {
+      "time": "13.3s",
+      "vus": 154,
+      "rps": 70.0,
+      "error_rate": 0.9468,
+      "p95_ms": 2517.85,
+      "p50_ms": 2514.66
+    },
+    {
+      "time": "14.6s",
+      "vus": 21,
+      "rps": 82.0,
+      "error_rate": 0.953,
+      "p95_ms": 2526.88,
+      "p50_ms": 2514.31
+    },
+    {
+      "time": "15.4s",
+      "vus": 21,
+      "rps": 65.5,
+      "error_rate": 0.9533,
+      "p95_ms": 2526.88,
+      "p50_ms": 2514.66
+    }
+  ],
+  "k6_exit_code": 99,
+  "stdout": " 200\n      \u21b3  4% \u2014 \u2713 50 / \u2717 1021\n    \u2717 not 503 overloaded\n      \u21b3  14% \u2014 \u2713 152 / \u2717 919\n\n    HTTP\n    http_req_duration..............: avg=2.31s   min=100.18ms med=2.5s     max=2.56s    p(90)=2.51s    p(95)=2.52s  \n      { expected_response:true }...: avg=127.6ms min=100.18ms med=131.34ms max=160.73ms p(90)=146.11ms p(95)=154.4ms\n    http_req_failed................: 95.33% 1021 out of 1071\n    http_reqs......................: 1071   72.821457/s\n\n    EXECUTION\n    iteration_duration.............: avg=2.51s   min=301.9ms  med=2.71s    max=2.76s    p(90)=2.71s    p(95)=2.72s  \n    iterations.....................: 1071   72.821457/s\n    vus............................: 21     min=21           max=200\n    vus_max........................: 200    min=200          max=200\n\n    NETWORK\n    data_received..................: 283 kB 19 kB/s\n    data_sent......................: 181 kB 12 kB/s\n\n\n\n\nrunning (14.7s), 000/200 VUs, 1071 complete and 0 interrupted iterations\ndefault \u2713 [ 100% ] 200 VUs  12s\n",
+  "stderr": "time=\"2026-09-05T02:06:39+05:30\" level=error msg=\"thresholds on metrics 'http_req_duration, http_req_failed' have been crossed\"\n",
+  "results_file": "C:\\Users\\abhin\\Desktop\\hackthon\\test_runs\\run_1788554165_4c64de\\results.json"
+}

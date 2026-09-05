@@ -1,0 +1,34 @@
+{
+  "test_type": "stress",
+  "target_url": "http://127.0.0.1:8001",
+  "virtual_users": 200,
+  "duration": "12s",
+  "ramp_pattern": [],
+  "endpoints_involved": [
+    {
+      "path": "/api/heavy",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payload_template": {
+        "field1": "value1",
+        "field2": "value2"
+      },
+      "weight": 100
+    }
+  ],
+  "success_criteria": {
+    "p95_ms": 200,
+    "max_error_rate": 0.1,
+    "p99_ms": 500
+  },
+  "assumptions_made": [
+    "Assumption 1: Defaulted to /api/heavy endpoint as it is known to be concurrency-sensitive.",
+    "Assumption 2: Defaulted to POST method as it is commonly used for heavy endpoints.",
+    "Assumption 3: Defaulted to 200 virtual users as it is a common starting point for stress testing.",
+    "Assumption 4: Defaulted to 12 seconds duration as it is a common duration for stress testing.",
+    "Assumption 5: Defaulted to 200ms p95, 10% max error rate, and 500ms p99 as common success criteria for stress testing."
+  ],
+  "summary_description": "Stress test the heavy endpoint with 200 users for 12 seconds to find the breaking point."
+}

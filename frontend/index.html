@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfexa - Autonomous AI Performance Testing Platform</title>
+  <meta name="description" content="AI-Powered autonomous performance testing platform transforming plain-English descriptions into verified k6 load tests with live metrics and AI diagnostics.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="navbar">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="assets/perfexa-logo.jpg" alt="Perfexa" class="brand-logo-img">
+        </div>
+        <div>
+          <h1 class="brand-title">Perfexa</h1>
+          <p class="brand-subtitle">Autonomous Load Testing & Diagnostic Engine</p>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <span class="status-badge" id="system-status"><span class="dot"></span> Target: Ready (:8001)</span>
+        <button id="btn-history-toggle" class="btn btn-outline" aria-expanded="false" aria-controls="history-section">📜 Run History (<span id="history-count">0</span>)</button>
+      </div>
+    </header>
+
+    <!-- Global Alert Banner for Graceful Error Reporting -->
+    <div id="alert-banner" class="alert-banner hidden" role="alert" aria-live="polite">
+      <span class="alert-icon">⚠️</span>
+      <span id="alert-message" class="alert-message"></span>
+      <button id="btn-close-alert" class="alert-close" aria-label="Dismiss alert">&times;</button>
+    </div>
+
+    <!-- Hero Showcase & Architecture Pipeline -->
+    <section class="hero-section">
+      <div class="hero-badge">⚡ AUTONOMOUS LOAD TESTING & INTELLIGENT TELEMETRY</div>
+      <h1 class="hero-title">Scale With Certainty.</h1>
+      <p class="hero-subtitle">Describe your traffic scenario in plain English. Perfexa synthesizes validated k6 load suites, streams real-time latency waveforms, and isolates concurrency bottlenecks with grounded AI analysis.</p>
+
+      <!-- 3-Step Visual Architecture Pipeline -->
+      <div class="pipeline-grid">
+        <div class="pipeline-card">
+          <div class="pipeline-num">01</div>
+          <div class="pipeline-body">
+            <h3>Intent & Payloads</h3>
+            <p>LLM extracts exact VUs, ramp stages, duration, and realistic synthetic payloads.</p>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-card">
+          <div class="pipeline-num">02</div>
+          <div class="pipeline-body">
+            <h3>k6 Load Engine</h3>
+            <p>Smoke-validated native k6 runner with sub-second WebSocket telemetry streaming.</p>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-card">
+          <div class="pipeline-num">03</div>
+          <div class="pipeline-body">
+            <h3>Grounded Diagnostics</h3>
+            <p>Root-cause analysis citing verified target limits without false infrastructure claims.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Telemetry Status Strip -->
+      <div class="telemetry-strip">
+        <div class="telemetry-pill">
+          <span class="telemetry-dot ready"></span>
+          <span class="telemetry-label">Target App:</span>
+          <strong>127.0.0.1:8001 (FastAPI)</strong>
+        </div>
+        <div class="telemetry-pill">
+          <span class="telemetry-dot ready"></span>
+          <span class="telemetry-label">Runner:</span>
+          <strong>k6 Standalone v0.57.0</strong>
+        </div>
+        <div class="telemetry-pill">
+          <span class="telemetry-dot ready"></span>
+          <span class="telemetry-label">Diagnostics:</span>
+          <strong>Meta Llama 3.2 11B (NIM)</strong>
+        </div>
+        <div class="telemetry-pill">
+          <span class="telemetry-dot ready"></span>
+          <span class="telemetry-label">Database:</span>
+          <strong id="telemetry-runs-count">25+ Benchmarks Saved</strong>
+        </div>
+      </div>
+    </section>
+
+    <main class="main-content">
+      <!-- Section 1: Prompt Input & Presets -->
+      <section class="card input-section">
+        <div class="section-header">
+          <h2>1. Describe Your Performance Test</h2>
+          <p class="section-desc">Type your goal in plain English. The AI will extract intent, configure ramp patterns, and generate synthetic payloads.</p>
+        </div>
+
+        <div class="preset-chips">
+          <span class="preset-label">Quick Presets:</span>
+          <button class="chip" data-prompt="stress test my heavy endpoint with 200 users for 20 seconds to find breaking point">🔥 Stress (Breaking Point)</button>
+          <button class="chip" data-prompt="run a baseline health check on my fast endpoint with 10 users for 15 seconds">✅ Baseline (10 VUs)</button>
+          <button class="chip" data-prompt="soak test my delayed endpoint for 30 seconds with 30 steady users">⏳ Soak (30 VUs, Latency)</button>
+        </div>
+
+        <form id="prompt-form" class="prompt-form">
+          <div class="input-wrapper">
+            <textarea id="prompt-input" rows="2" placeholder="e.g. stress test my login and checkout API with 200 users for 20 seconds..." aria-label="Performance test description in natural language" required></textarea>
+            <button type="submit" id="btn-analyze" class="btn btn-primary">
+              <span class="btn-text">Analyze Intent</span>
+              <span class="spinner hidden" id="analyze-spinner"></span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Benchmark Quick-Load Strip -->
+        <div class="benchmark-shortcuts" id="benchmark-shortcuts">
+          <span class="preset-label">Recent Benchmarks:</span>
+          <div id="recent-runs-pills" class="recent-pills"></div>
+        </div>
+      </section>
+
+      <!-- Section 2: Understood Intent Review Card -->
+      <section id="intent-section" class="card intent-section hidden">
+        <div class="section-header intent-header">
+          <div>
+            <div class="badge-row">
+              <span id="intent-badge-type" class="badge badge-stress">STRESS</span>
+              <span id="intent-badge-vus" class="badge badge-neutral">200 VUs</span>
+              <span id="intent-badge-duration" class="badge badge-neutral">20s</span>
+            </div>
+            <h3 id="intent-summary-title">Extracted Test Intent</h3>
+            <p class="intent-step-hint" style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">AI analyzed your problem. Click the button on the right to start the live k6 engine and generate fresh diagnostics.</p>
+          </div>
+          <button id="btn-run-test" class="btn btn-success btn-lg pulse-glow">
+            <span>⚡ Execute Load Test & Generate Report</span>
+          </button>
+        </div>
+
+        <div class="intent-grid">
+          <div class="intent-col">
+            <h4>Endpoints & Traffic</h4>
+            <div id="intent-endpoints-list" class="tag-list"></div>
+
+            <h4 class="mt-3">Success Criteria (Thresholds)</h4>
+            <div id="intent-criteria" class="criteria-box"></div>
+          </div>
+
+          <div class="intent-col">
+            <h4>AI Assumptions & Default Interpretations</h4>
+            <ul id="intent-assumptions" class="assumptions-list"></ul>
+
+            <h4 class="mt-3">Synthetic Payloads Sample</h4>
+            <pre id="intent-payload-preview" class="code-preview"></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Live Execution Dashboard (Step 6/7 Live Stream) -->
+      <section id="live-dashboard-section" class="card dashboard-section hidden">
+        <div class="dashboard-header">
+          <div>
+            <div class="live-indicator">
+              <span class="pulse-dot"></span>
+              <span id="run-status-text">RUNNING LOAD TEST</span>
+            </div>
+            <p id="run-id-display" class="mono text-muted">run_id: -</p>
+          </div>
+          <div class="timer-display">
+            <span>Elapsed: </span><strong id="live-elapsed">0.0s</strong>
+          </div>
+        </div>
+
+        <!-- Metric Stat Cards -->
+        <div class="metric-cards">
+          <div class="stat-card">
+            <span class="stat-label">Active Virtual Users</span>
+            <div class="stat-value" id="stat-vus">0</div>
+            <span class="stat-sub">VUs in flight</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Throughput</span>
+            <div class="stat-value" id="stat-rps">0.0</div>
+            <span class="stat-sub">requests / sec</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">p95 Latency</span>
+            <div class="stat-value" id="stat-p95">0 ms</div>
+            <span class="stat-sub">95th percentile</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Error Rate</span>
+            <div class="stat-value" id="stat-error-rate">0.0%</div>
+            <span class="stat-sub" id="stat-failed-count">0 failed</span>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+          <div class="chart-container">
+            <h4>Virtual Users Over Time</h4>
+            <canvas id="vusChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h4>Latency & Errors Over Time</h4>
+            <canvas id="latencyChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Results & AI Summary View (Step 8/9 Final View) -->
+      <section id="results-section" class="card results-section hidden">
+        <div class="results-header">
+          <div class="results-title-group">
+            <div id="verdict-banner" class="verdict-banner">ANALYZING...</div>
+            <h2>Autonomous Test Report & Diagnostics</h2>
+          </div>
+          <button id="btn-view-script" class="btn btn-outline" aria-expanded="false" aria-controls="script-drawer">View Generated k6 Script</button>
+        </div>
+
+        <!-- Generated Script Modal/Accordion -->
+        <div id="script-drawer" class="script-drawer hidden">
+          <div class="script-drawer-header">
+            <h4>Synthesized k6 JavaScript Load-Test Script</h4>
+            <button id="btn-close-script" class="btn btn-sm btn-outline">Close</button>
+          </div>
+          <pre id="script-code-block" class="code-preview"></pre>
+        </div>
+
+        <!-- Key Metrics Scorecards -->
+        <div class="scorecard-grid" id="scorecard-grid"></div>
+
+        <!-- AI Diagnostic Report Rendered Markdown -->
+        <div class="ai-report-card">
+          <div class="ai-badge">🤖 AI Performance Diagnostic Report</div>
+          <div id="ai-report-body" class="markdown-body"></div>
+        </div>
+      </section>
+
+      <!-- Section 5: Run History Drawer -->
+      <section id="history-section" class="card history-section hidden">
+        <div class="history-header">
+          <h2>Test Run History</h2>
+          <button id="btn-refresh-history" class="btn btn-outline btn-sm">🔄 Refresh</button>
+        </div>
+        <div class="history-table-wrapper">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Type</th>
+                <th>Prompt</th>
+                <th>VUs</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Error %</th>
+                <th>p95</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
