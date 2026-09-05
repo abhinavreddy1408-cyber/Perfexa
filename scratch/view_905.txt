@@ -1,0 +1,64 @@
+Created At: 2026-09-06T02:32:29+05:30
+Completed At: 2026-09-06T02:32:29+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 787
+Total Bytes: 50789
+Showing lines 250 to 305
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+250:           gl_Position = projectionMatrix * mvPosition;
+251:         }
+252:       `,
+253:       fragmentShader: `
+254:         varying vec3 vNormal;
+255:         varying vec3 vViewPosition;
+256:         varying vec3 vWorldPosition;
+257:         uniform vec3 uSunPosition;
+258:         uniform vec3 uEarthCenter;
+259: 
+260:         void main() {
+261:           vec3 normal = normalize(vNormal);
+262:           vec3 viewDir = normalize(vViewPosition);
+263:           float rim = 1.0 - max(0.0, dot(normal, viewDir));
+264:           if (rim <= 0.0) discard;
+265: 
+266:           // Exponential Rayleigh limb glow hugging the horizon
+267:           float intensity = pow(rim, 3.2);
+268: 
+269:           // Sunlight illumination factor
+270:           vec3 sunDir = normalize(uSunPosition - uEarthCenter);
+271:           vec3 atmoNormal = normalize(vWorldPosition - uEarthCenter);
+272:           float sunDot = dot(atmoNormal, sunDir);
+273:           float sunFactor = smoothstep(-0.25, 0.45, sunDot);
+274: 
+275:           // Electric cyan / deep azure Rayleigh gradient
+276:           vec3 azure = vec3(0.01, 0.35, 0.95);
+277:           vec3 cyan = vec3(0.06, 0.80, 1.0);
+278:           vec3 highlight = vec3(0.85, 0.96, 1.0);
+279: 
+280:           vec3 atmoColor = mix(azure, cyan, pow(rim, 1.4) * sunFactor);
+281:           // Sunlit forward-scatter specular highlight on the outermost horizon ribbon
+282:           atmoColor = mix(atmoColor, highlight, pow(rim, 4.5) * sunFactor * 0.4);
+283: 
+284:           float alpha = intensity * (sunFactor * 2.8 + 0.04);
+285:           gl_FragColor = vec4(atmoColor, clamp(alpha, 0.0, 1.0));
+286:         }
+287:       `,
+288:       uniforms: {
+289:         uSunPosition: { value: sunPosition },
+290:         uEarthCenter: { value: earthGroup.position }
+291:       },
+292:       blending: THREE.AdditiveBlending,
+293:       side: THREE.FrontSide,
+294:       transparent: true,
+295:       depthWrite: false
+296:     });
+297:     const atmoMesh = new THREE.Mesh(atmoGeo, atmoMat);
+298:     earthGroup.add(atmoMesh);
+299: 
+300:     const onResize = () => {
+301:       const w = container.clientWidth || window.innerWidth;
+302:       const h = container.clientHeight || window.innerHeight;
+303:       camera.aspect = w / h;
+304:       camera.updateProjectionMatrix();
+305:       renderer.setSize(w, h);
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

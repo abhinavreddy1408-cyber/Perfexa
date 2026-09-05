@@ -1,0 +1,69 @@
+Created At: 2026-09-06T02:59:14+05:30
+Completed At: 2026-09-06T02:59:14+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 935
+Total Bytes: 62035
+Showing lines 690 to 750
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+690:     <!-- Section 5: Run History Drawer -->
+691:     <section id="history-section" class="card history-section hidden rounded-xl bg-[#120f16]/75 backdrop-blur-xl border border-[#f7a8a0]/15 p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+692:       <div class="history-header flex items-center justify-between pb-4 mb-4 border-b border-[#f7a8a0]/15">
+693:         <h2 class="font-display text-lg font-bold text-white">Test Run History</h2>
+694:         <button id="btn-refresh-history" class="btn btn-outline btn-sm px-3 py-1 rounded-md border border-[#e8d5b5]/30 text-xs text-[#ded2dc] hover:text-white">Refresh</button>
+695:       </div>
+696:       <div class="history-table-wrapper overflow-x-auto">
+697:         <table class="history-table w-full text-left text-xs border-collapse">
+698:           <thead>
+699:             <tr class="border-b border-[#f7a8a0]/15 text-[#a595a0] uppercase tracking-wider text-[10px]">
+700:               <th class="py-2.5 px-3">Time</th>
+701:               <th class="py-2.5 px-3">Type</th>
+702:               <th class="py-2.5 px-3">Prompt</th>
+703:               <th class="py-2.5 px-3">VUs</th>
+704:               <th class="py-2.5 px-3">Duration</th>
+705:               <th class="py-2.5 px-3">Status</th>
+706:               <th class="py-2.5 px-3">Error %</th>
+707:               <th class="py-2.5 px-3">p95</th>
+708:               <th class="py-2.5 px-3">Action</th>
+709:             </tr>
+710:           </thead>
+711:           <tbody id="history-table-body" class="divide-y divide-[#f7a8a0]/10 font-mono text-[11px]"></tbody>
+712:         </table>
+713:       </div>
+714:     </section>
+715:   
+716:       </div>
+717:     </div>
+718:   </main>
+719: 
+720:   <!-- Sleek Dark Material Footer -->
+721:   <footer class="w-full bg-[#0e0c10]/95 backdrop-blur-md border-t border-[#f4a6a0]/15 shadow-[0_-1px_16px_rgba(0,0,0,0.5)]">
+722:     <div class="w-full px-5 sm:px-10 py-5 flex flex-col md:flex-row items-center justify-between gap-4 text-[#c4b5b8]">
+723:       <div class="flex items-center gap-4">
+724:         <div class="flex items-center gap-2">
+725:           <span class="material-symbols-outlined text-[#f4a6a0] text-[18px]">bolt</span>
+726:           <span class="font-telemetry-mono text-telemetry-mono uppercase text-[#a29299] text-[11px]">STATUS:</span>
+727:           <span class="font-telemetry-mono text-telemetry-mono text-[#ffd4cf] text-[11px]">AI REASONING CORE ENGAGED</span>
+728:         </div>
+729:       </div>
+730:       <div class="font-telemetry-mono text-telemetry-mono text-[#a29299] text-[11px] tracking-wide">
+731:         &copy; 2025 PERFEXA AI INC. ALL RIGHTS RESERVED.
+732:       </div>
+733:     </div>
+734:   </footer>
+735: 
+736:   <!-- 3D Warm Rose-Gold Globe & Particle Cloud Script -->
+737:   <script>
+738:     (() => {
+739:       const container = document.getElementById('three-globe-container');
+740:       if (container && window.THREE) {
+741:         const scene = new THREE.Scene();
+742:         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+743:         camera.position.z = 240;
+744: 
+745:         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+746:         renderer.setSize(container.clientWidth, container.clientHeight);
+747:         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+748:         container.appendChild(renderer.domElement);
+749: 
+750:         const globeGroup = new THREE.Group();
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

@@ -1,0 +1,209 @@
+Created At: 2026-09-06T02:28:27+05:30
+Completed At: 2026-09-06T02:28:27+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 757
+Total Bytes: 49194
+Showing lines 85 to 285
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+85:     const height = container.clientHeight || window.innerHeight;
+86: 
+87:     const scene = new THREE.Scene();
+88:     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+89:     camera.position.set(0, 0, 95);
+90: 
+91:     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+92:     renderer.setSize(width, height);
+93:     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+94:     renderer.toneMapping = THREE.ACESFilmicToneMapping;
+95:     renderer.toneMappingExposure = 1.18;
+96:     container.appendChild(renderer.domElement);
+97: 
+98:     const rootGroup = new THREE.Group();
+99:     scene.add(rootGroup);
+100: 
+101:     // Deep Space Starfield (Subtle, crisp, pinpoint celestial stars)
+102:     const starCount = 380;
+103:     const starGeo = new THREE.BufferGeometry();
+104:     const starPos = new Float32Array(starCount * 3);
+105:     for (let i = 0; i < starCount; i++) {
+106:       starPos[i * 3] = (Math.random() - 0.5) * 450;
+107:       starPos[i * 3 + 1] = (Math.random() - 0.5) * 320;
+108:       starPos[i * 3 + 2] = -90 - Math.random() * 140;
+109:     }
+110:     starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+111:     const starMat = new THREE.PointsMaterial({
+112:       size: 0.95,
+113:       color: 0xe0f2fe,
+114:       transparent: true,
+115:       opacity: 0.72
+116:     });
+117:     const starField = new THREE.Points(starGeo, starMat);
+118:     scene.add(starField);
+119: 
+120:     // High-Contrast Star Lighting (Calibrated for photorealistic ACESFilmic tone mapping)
+121:     const sunPosition = new THREE.Vector3(85, 65, 22);
+122:     const sunLight = new THREE.DirectionalLight(0xffffff, 2.4);
+123:     sunLight.position.copy(sunPosition);
+124:     scene.add(sunLight);
+125: 
+126:     // Cosmic Deep Space Ambient (Provides subtle visibility while preserving black void)
+127:     const ambientLight = new THREE.AmbientLight(0x060c1c, 0.35);
+128:     scene.add(ambientLight);
+129: 
+130:     // Subtle Starlight Back-Rim (Soft cosmic fill on dark limb)
+131:     const spaceRim = new THREE.DirectionalLight(0x03142e, 0.32);
+132:     spaceRim.position.set(-90, -40, -40);
+133:     scene.add(spaceRim);
+134: 
+135:     // Authentic NASA Earth Maps (Pre-downloaded locally)
+136:     const textureLoader = new THREE.TextureLoader();
+137:     const earthDayMap = textureLoader.load('assets/earth/earth_atmos_2048.jpg');
+138:     const earthCloudsMap = textureLoader.load('assets/earth/earth_clouds_1024.png');
+139:     const earthNormalMap = textureLoader.load('assets/earth/earth_normal_2048.jpg');
+140:     const earthSpecMap = textureLoader.load('assets/earth/earth_specular_2048.jpg');
+141:     const earthNightMap = textureLoader.load('assets/earth/earth_lights_2048.png');
+142: 
+143:     [earthDayMap, earthCloudsMap, earthNormalMap, earthSpecMap, earthNightMap].forEach(tex => {
+144:       tex.generateMipmaps = true;
+145:       tex.minFilter = THREE.LinearMipmapLinearFilter;
+146:     });
+147: 
+148:     // Grand Orbital Earth Horizon Composition (Matches Reference Image)
+149:     // Curvature sweeps gracefully from bottom-left to upper-right
+150:     const earthGroup = new THREE.Group();
+151:     const earthRadius = 74;
+152:     earthGroup.position.set(28, -50, -16);
+153:     rootGroup.add(earthGroup);
+154: 
+155:     // Sun direction vector in view space for seamless day/night masking
+156:     const sunDirWorld = sunPosition.clone().sub(earthGroup.position).normalize();
+157:     const sunUniformView = { value: new THREE.Vector3() };
+158:     const updateSunView = () => {
+159:       sunUniformView.value.copy(sunDirWorld).applyQuaternion(camera.quaternion.clone().invert()).normalize();
+160:     };
+161:     updateSunView();
+162: 
+163:     // 1. Earth Solid Surface with Deep Sapphire Oceans & Authentic Continents
+164:     const earthGeo = new THREE.SphereGeometry(earthRadius, 128, 128);
+165:     const earthMat = new THREE.MeshPhongMaterial({
+166:       map: earthDayMap,
+167:       shininess: 25,
+168:       specular: new THREE.Color(0x1a3a60),
+169:       emissiveMap: earthNightMap,
+170:       emissive: new THREE.Color(0xffb066),
+171:       emissiveIntensity: 0.85
+172:     });
+173: 
+174:     // Mask city lights so they ONLY glow on the dark night hemisphere
+175:     earthMat.onBeforeCompile = (shader) => {
+176:       shader.uniforms.uSunDirView = sunUniformView;
+177:       shader.fragmentShader = shader.fragmentShader.replace(
+178:         '#include <common>',
+179:         `#include <common>
+180:          uniform vec3 uSunDirView;`
+181:       );
+182:       shader.fragmentShader = shader.fragmentShader.replace(
+183:         '#include <emissivemap_fragment>',
+184:         `#include <emissivemap_fragment>
+185:          vec3 viewN = normalize(vNormal);
+186:          float dayDot = dot(viewN, uSunDirView);
+187:          float nightMask = 1.0 - smoothstep(-0.15, 0.25, dayDot);
+188:          totalEmissiveRadiance *= nightMask * 1.5;`
+189:       );
+190:     };
+191: 
+192:     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+193:     earthMesh.rotation.z = THREE.MathUtils.degToRad(23.4);
+194:     earthMesh.rotation.y = THREE.MathUtils.degToRad(25);
+195:     earthGroup.add(earthMesh);
+196: 
+197:     // 2. Swirling Atmospheric Cloud Layer (Photorealistic Swirls via Additive Blending)
+198:     // Black background in cloud texture becomes 100% transparent; white clouds float seamlessly
+199:     const cloudGeo = new THREE.SphereGeometry(earthRadius * 1.008, 96, 96);
+200:     const cloudMat = new THREE.MeshBasicMaterial({
+201:       map: earthCloudsMap,
+202:       transparent: true,
+203:       opacity: 0.72,
+204:       blending: THREE.AdditiveBlending,
+205:       depthWrite: false
+206:     });
+207:     const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+208:     cloudMesh.rotation.z = THREE.MathUtils.degToRad(23.4);
+209:     cloudMesh.rotation.y = THREE.MathUtils.degToRad(25);
+210:     earthGroup.add(cloudMesh);
+211: 
+212:     // 3. Radiant Rayleigh Scattering Atmospheric Limb Glow (FrontSide Fresnel)
+213:     // Matches Reference Photo: Electric Azure/Cyan halo along the curved horizon
+214:     const atmoGeo = new THREE.SphereGeometry(earthRadius * 1.018, 96, 96);
+215:     const atmoMat = new THREE.ShaderMaterial({
+216:       vertexShader: `
+217:         varying vec3 vNormal;
+218:         varying vec3 vViewPosition;
+219:         varying vec3 vWorldPosition;
+220:         void main() {
+221:           vNormal = normalize(normalMatrix * normal);
+222:           vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+223:           vViewPosition = -mvPosition.xyz;
+224:           vec4 worldPos = modelMatrix * vec4(position, 1.0);
+225:           vWorldPosition = worldPos.xyz;
+226:           gl_Position = projectionMatrix * mvPosition;
+227:         }
+228:       `,
+229:       fragmentShader: `
+230:         varying vec3 vNormal;
+231:         varying vec3 vViewPosition;
+232:         varying vec3 vWorldPosition;
+233:         uniform vec3 uSunPosition;
+234:         uniform vec3 uEarthCenter;
+235: 
+236:         void main() {
+237:           vec3 normal = normalize(vNormal);
+238:           vec3 viewDir = normalize(vViewPosition);
+239:           float rim = 1.0 - max(0.0, dot(normal, viewDir));
+240:           // Exponential Rayleigh limb glow hugging the horizon
+241:           float intensity = pow(rim, 3.2);
+242: 
+243:           // Sunlight illumination factor
+244:           vec3 sunDir = normalize(uSunPosition - uEarthCenter);
+245:           vec3 atmoNormal = normalize(vWorldPosition - uEarthCenter);
+246:           float sunDot = dot(atmoNormal, sunDir);
+247:           float sunFactor = smoothstep(-0.25, 0.45, sunDot);
+248: 
+249:           // Electric cyan / deep azure Rayleigh gradient
+250:           vec3 azure = vec3(0.01, 0.35, 0.95);
+251:           vec3 cyan = vec3(0.06, 0.78, 1.0);
+252:           vec3 atmoColor = mix(azure, cyan, pow(rim, 1.5) * sunFactor);
+253: 
+254:           float alpha = intensity * (sunFactor * 2.8 + 0.05);
+255:           gl_FragColor = vec4(atmoColor, clamp(alpha, 0.0, 1.0));
+256:         }
+257:       `,
+258:       uniforms: {
+259:         uSunPosition: { value: sunPosition },
+260:         uEarthCenter: { value: earthGroup.position }
+261:       },
+262:       blending: THREE.AdditiveBlending,
+263:       side: THREE.FrontSide,
+264:       transparent: true,
+265:       depthWrite: false
+266:     });
+267:     const atmoMesh = new THREE.Mesh(atmoGeo, atmoMat);
+268:     earthGroup.add(atmoMesh);
+269: 
+270:     const onResize = () => {
+271:       const w = container.clientWidth || window.innerWidth;
+272:       const h = container.clientHeight || window.innerHeight;
+273:       camera.aspect = w / h;
+274:       camera.updateProjectionMatrix();
+275:       renderer.setSize(w, h);
+276:     };
+277:     window.addEventListener('resize', onResize);
+278: 
+279:     // Zero cursor tracking - calm, serene, majestic
+280:     const animate = () => {
+281:       requestAnimationFrame(animate);
+282: 
+283:       updateSunView();
+284: 
+285:       // Autonomous slow, majestic rotation of Earth
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

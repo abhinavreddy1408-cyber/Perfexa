@@ -1,0 +1,12 @@
+Created At: 2026-09-06T03:15:13+05:30
+Completed At: 2026-09-06T03:15:13+05:30
+
+				The command exited with code 0.
+				Output:
+				Step 1015 lines viewed: Created At: 2026-09-06T02:48:05+05:30
+Completed At: 2026-09-06T02:48:05+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 795
+Total Bytes: 51267
+Showing lines
+

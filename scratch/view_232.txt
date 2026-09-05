@@ -1,0 +1,28 @@
+Created At: 2026-09-06T01:25:22+05:30
+Completed At: 2026-09-06T01:25:22+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 700
+Total Bytes: 44317
+Showing lines 1 to 20
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: <!DOCTYPE html>
+2: <html class="dark" lang="en">
+3: <head>
+4:   <meta charset="utf-8"/>
+5:   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+6:   <title>Perfexa - Autonomous Load Testing &amp; Diagnostic Engine</title>
+7:   <meta name="description" content="AI-Powered autonomous performance testing platform transforming plain-English descriptions into verified k6 load tests with live metrics and AI diagnostics.">
+8:   <link href="https://fonts.googleapis.com" rel="preconnect"/>
+9:   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+10:   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+11:   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+12:   
+13:   <script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+14:   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+15:   <script id="tailwind-config">
+16:     tailwind.config = {
+17:       darkMode: "class",
+18:       theme: {
+19:         extend: {
+20:           colors: {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

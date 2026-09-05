@@ -1,0 +1,44 @@
+Created At: 2026-09-06T02:48:10+05:30
+Completed At: 2026-09-06T02:48:10+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 795
+Total Bytes: 51267
+Showing lines 98 to 133
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+98:     const rootGroup = new THREE.Group();
+99:     scene.add(rootGroup);
+100: 
+101:     // High-Precision Multi-Magnitude Deep Space Starfield
+102:     const starCount = 460;
+103:     const starGeo = new THREE.BufferGeometry();
+104:     const starPos = new Float32Array(starCount * 3);
+105:     const starColors = new Float32Array(starCount * 3);
+106:     for (let i = 0; i < starCount; i++) {
+107:       starPos[i * 3] = (Math.random() - 0.5) * 460;
+108:       starPos[i * 3 + 1] = (Math.random() - 0.5) * 320;
+109:       starPos[i * 3 + 2] = -90 - Math.random() * 150;
+110: 
+111:       // Realistic astronomical color variations: ice-blue, pure white, and soft stellar gold
+112:       const r = Math.random();
+113:       if (r < 0.25) {
+114:         starColors[i * 3] = 0.82; starColors[i * 3 + 1] = 0.92; starColors[i * 3 + 2] = 1.0; // Ice blue
+115:       } else if (r < 0.85) {
+116:         starColors[i * 3] = 0.96; starColors[i * 3 + 1] = 0.98; starColors[i * 3 + 2] = 1.0; // Crisp white
+117:       } else {
+118:         starColors[i * 3] = 1.0; starColors[i * 3 + 1] = 0.94; starColors[i * 3 + 2] = 0.85; // Warm stellar
+119:       }
+120:     }
+121:     starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+122:     starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+123:     const starMat = new THREE.PointsMaterial({
+124:       size: 0.88,
+125:       vertexColors: true,
+126:       transparent: true,
+127:       opacity: 0.78,
+128:       sizeAttenuation: true
+129:     });
+130:     const starField = new THREE.Points(starGeo, starMat);
+131:     scene.add(starField);
+132: 
+133:     // High-Contrast Cinematic Sun Lighting (Calibrated for photorealistic ACESFilmic tone mapping)
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

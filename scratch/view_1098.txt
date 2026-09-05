@@ -1,0 +1,59 @@
+Created At: 2026-09-06T02:59:10+05:30
+Completed At: 2026-09-06T02:59:10+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 935
+Total Bytes: 62035
+Showing lines 830 to 880
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+830:         grad.addColorStop(1, 'rgba(0,0,0,0)');
+831:         ctx.fillStyle = grad;
+832:         ctx.fillRect(0, 0, 32, 32);
+833: 
+834:         const pointTexture = new THREE.CanvasTexture(canvas);
+835:         const particleMat = new THREE.PointsMaterial({
+836:           size: 3.5,
+837:           vertexColors: true,
+838:           map: pointTexture,
+839:           transparent: true,
+840:           opacity: 0.85,
+841:           blending: THREE.AdditiveBlending,
+842:           depthWrite: false
+843:         });
+844: 
+845:         const points = new THREE.Points(particleGeo, particleMat);
+846:         globeGroup.add(points);
+847: 
+848:         // Warm Ambient & Point Lights (Rose Gold & Champagne)
+849:         const pointLight1 = new THREE.PointLight(0xf4a6a0, 2.5, 300);
+850:         pointLight1.position.set(60, 40, 120);
+851:         scene.add(pointLight1);
+852: 
+853:         const pointLight2 = new THREE.PointLight(0xd4af37, 1.8, 300);
+854:         pointLight2.position.set(-80, -60, 90);
+855:         scene.add(pointLight2);
+856: 
+857:         // Interaction Handling
+858:         let isRotating = true;
+859:         let isDragging = false;
+860:         let prevMousePos = { x: 0, y: 0 };
+861: 
+862:         const onMouseDown = (e) => {
+863:           isDragging = true;
+864:           prevMousePos = { x: e.clientX, y: e.clientY };
+865:         };
+866: 
+867:         const onMouseMove = (e) => {
+868:           if (!isDragging) return;
+869:           const deltaX = e.clientX - prevMousePos.x;
+870:           const deltaY = e.clientY - prevMousePos.y;
+871:           globeGroup.rotation.y += deltaX * 0.006;
+872:           globeGroup.rotation.x += deltaY * 0.006;
+873:           prevMousePos = { x: e.clientX, y: e.clientY };
+874:         };
+875: 
+876:         const onMouseUp = () => { isDragging = false; };
+877: 
+878:         container.addEventListener('mousedown', onMouseDown);
+879:         window.addEventListener('mousemove', onMouseMove);
+880:         window.addEventListener('mouseup', onMouseUp);
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

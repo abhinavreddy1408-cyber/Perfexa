@@ -1,0 +1,69 @@
+Created At: 2026-09-06T02:59:06+05:30
+Completed At: 2026-09-06T02:59:07+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 935
+Total Bytes: 62035
+Showing lines 260 to 320
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+260:               <div class="px-4 py-1.5 bg-[#181218]/85 backdrop-blur-md border border-[#d4af37]/30 rounded-full flex items-center gap-2 shadow-[0_2px_10px_rgba(0,0,0,0.3)]">
+261:                 <span class="w-1.5 h-1.5 rounded-full bg-[#f5d0c5]"></span>
+262:                 <span class="font-telemetry-mono text-[12px] text-[#e2dcd5] tracking-wide">Grounded diagnostics</span>
+263:               </div>
+264:             </div>
+265:             <div class="flex items-center justify-center gap-4">
+266:               <a class="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#fbf3ea] via-[#f3e3cc] to-[#edd6be] text-[#120e14] font-semibold text-[15px] rounded-xl hover:from-white hover:to-[#fbf3ea] transition-all shadow-[0_4px_28px_rgba(244,166,160,0.28)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer" href="#app-workspace">
+267:                 <span class="font-semibold tracking-tight">Launch Perfexa</span>
+268:                 <span class="text-lg leading-none">→</span>
+269:               </a>
+270:             </div>
+271:           </div>
+272: 
+273:           <!-- Bottom Telemetry & Controls Bar -->
+274:           <div class="w-full flex items-end justify-between gap-space-md pb-2 sm:pb-4">
+275:             <div class="flex items-center gap-space-xs px-space-sm py-space-2xs bg-[#181218]/90 backdrop-blur-md border border-[#f4a6a0]/25 rounded-full pointer-events-auto shadow-lg">
+276:               <span class="w-2 h-2 rounded-full bg-[#f4a6a0] animate-pulse"></span>
+277:               <span class="font-telemetry-mono text-telemetry-mono uppercase text-[#d6cfce] tracking-wider text-[11px]">SYNTHETIC NODES READY: 184 ACTIVE REGIONS</span>
+278:             </div>
+279:             <div class="pointer-events-auto flex items-center bg-[#141016]/95 backdrop-blur-xl px-space-md py-space-xs rounded-full border border-[#d4af37]/30 shadow-2xl gap-space-md">
+280:               <div class="flex items-center gap-space-2xs text-[#c4b5b8] px-space-xs">
+281:                 <span class="material-symbols-outlined text-[16px] text-[#e8998d]">pan_tool</span>
+282:                 <span class="font-telemetry-mono text-telemetry-mono uppercase tracking-wider hidden sm:inline text-[#d6cfce]">Drag Orbit</span>
+283:               </div>
+284:               <div class="h-4 w-px bg-[#362a32]"></div>
+285:               <div class="flex items-center gap-space-2xs">
+286:                 <button class="w-8 h-8 rounded-full bg-[#f4a6a0]/20 hover:bg-[#f4a6a0]/30 text-[#ffd4cf] flex items-center justify-center transition-all border border-[#f4a6a0]/30 cursor-pointer" id="btn-autorotate" title="Toggle Auto-Rotation">
+287:                   <span class="material-symbols-outlined text-[18px]">sync</span>
+288:                 </button>
+289:                 <button class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 text-[#c4b5b8] hover:text-white flex items-center justify-center transition-all border border-white/10 cursor-pointer" id="btn-reset" title="Reset Viewport">
+290:                   <span class="material-symbols-outlined text-[18px]">center_focus_strong</span>
+291:                 </button>
+292:               </div>
+293:             </div>
+294:             <div class="hidden md:flex items-center gap-space-2xs bg-[#181218]/90 backdrop-blur-md px-space-sm py-space-2xs rounded-full border border-[#f4a6a0]/25 pointer-events-auto shadow-lg">
+295:               <span class="font-telemetry-mono text-telemetry-mono text-[#c4b5b8] uppercase text-[11px]">ENGINE:</span>
+296:               <span class="font-telemetry-mono text-telemetry-mono text-[#f4a6a0] font-semibold text-[11px]">v2.8.4-PROD</span>
+297:             </div>
+298:           </div>
+299:         </div>
+300:       </section>
+301: 
+302:       <!-- Global Alert Banner for Graceful Error Reporting -->
+303:       <div id="alert-banner" class="alert-banner hidden max-w-[1440px] mx-auto px-6 sm:px-10 mt-4" role="alert" aria-live="polite">
+304:         <span class="alert-icon"></span>
+305:         <span id="alert-message" class="alert-message"></span>
+306:         <button id="btn-close-alert" class="alert-close" aria-label="Dismiss alert">&times;</button>
+307:       </div>
+308: 
+309:       <!-- 2. ACTUAL WEBSITE WORKSPACE SECTION (100% Functionality Preserved) -->
+310:       <div id="app-workspace" class="scroll-mt-20 w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-10 pt-8 pb-20 space-y-6">
+311: <!-- Main Content Layout positioned cleanly above 3D scene -->
+312:   <main class="relative z-10 w-full max-w-[1440px] mx-auto px-6 sm:px-10 pt-10 pb-16 space-y-6">
+313:     <!-- Hero Header & Top-Right Compact Pipeline -->
+314:     <div class="flex flex-col lg:flex-row items-start lg:items-start justify-between gap-6 mb-3">
+315:       <!-- Left: Hero Headline & Description -->
+316:       <div class="hero-section flex flex-col items-start max-w-2xl">
+317:         <div class="hero-badge inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#1b141d]/70 border border-[#f7a8a0]/30 backdrop-blur-md mb-3 shadow-[0_0_15px_rgba(247,168,160,0.12)]">
+318:           <span class="font-mono text-[10px] tracking-wider uppercase font-semibold text-[#ffd1cc]">AUTONOMOUS LOAD TESTING &amp; INTELLIGENT TELEMETRY</span>
+319:         </div>
+320:         <h1 class="hero-title font-display text-3xl sm:text-4xl lg:text-[44px] font-bold tracking-tight leading-[1.15] mb-2.5 bg-gradient-to-r from-[#ffd1cc] via-[#f7a8a0] to-[#e0838a] bg-clip-text text-transparent drop-shadow-[0_2px_18px_rgba(247,168,160,0.2)]">Scale With Certainty.</h1>
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

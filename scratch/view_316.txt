@@ -1,0 +1,79 @@
+Created At: 2026-09-06T01:38:21+05:30
+Completed At: 2026-09-06T01:38:21+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 702
+Total Bytes: 43851
+Showing lines 450 to 520
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+450:               <button type="button" id="btn-remove-file" class="btn-remove-file text-[#f7a8a0] hover:text-white font-bold ml-1" title="Remove selected file">&times;</button>
+451:             </div>
+452:           </div>
+453:         </div>
+454:         <div class="upload-actions flex justify-end">
+455:           <button type="button" id="btn-analyze-code" class="btn btn-primary px-6 py-2.5 rounded-lg border border-[#f3e3cc] text-[#120e14] bg-gradient-to-r from-[#faeade] via-[#f3e3cc] to-[#ebd2ba] font-semibold text-xs hover:brightness-105 active:scale-[0.99] transition-all shadow-[0_0_20px_rgba(243,227,204,0.3)] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2" disabled>
+456:             <span class="btn-text">Run Static Analysis &amp; AI Review</span>
+457:             <span class="spinner hidden w-3.5 h-3.5 border-2 border-[#120e14] border-t-transparent rounded-full animate-spin" id="corrector-spinner"></span>
+458:           </button>
+459:         </div>
+460:       </div>
+461: 
+462:       <!-- Corrector Results Section -->
+463:       <div id="corrector-results" class="corrector-results hidden mt-6 space-y-5">
+464:         <!-- Scorecards -->
+465:         <div class="scorecard-grid grid grid-cols-2 sm:grid-cols-5 gap-3">
+466:           <div class="stat-card p-3 rounded-lg bg-[#161217]/80 border border-[#e8d5b5]/25">
+467:             <span class="stat-label text-[11px] text-[#a595a0]">Language</span>
+468:             <div class="stat-value font-mono font-bold text-white text-lg mt-0.5" id="corrector-stat-lang">-</div>
+469:             <span class="stat-sub text-[10px] text-[#8a7587]" id="corrector-stat-lines">0 lines</span>
+470:           </div>
+471:           <div class="stat-card p-3 rounded-lg bg-[#161217]/80 border border-[#e8d5b5]/25">
+472:             <span class="stat-label text-[11px] text-[#a595a0]">Total Findings</span>
+473:             <div class="stat-value font-mono font-bold text-[#faeade] text-lg mt-0.5" id="corrector-stat-total">0</div>
+474:             <span class="stat-sub text-[10px] text-[#8a7587]">Issues detected</span>
+475:           </div>
+476:           <div class="stat-card p-3 rounded-lg bg-[#161217]/80 border border-red-500/30">
+477:             <span class="stat-label text-[11px] text-[#a595a0]">Critical Errors</span>
+478:             <div class="stat-value font-mono font-bold text-red-400 text-lg mt-0.5" id="corrector-stat-errors">0</div>
+479:             <span class="stat-sub text-[10px] text-red-400/80">Must fix first</span>
+480:           </div>
+481:           <div class="stat-card p-3 rounded-lg bg-[#161217]/80 border border-amber-500/30">
+482:             <span class="stat-label text-[11px] text-[#a595a0]">Warnings</span>
+483:             <div class="stat-value font-mono font-bold text-amber-400 text-lg mt-0.5" id="corrector-stat-warnings">0</div>
+484:             <span class="stat-sub text-[10px] text-amber-400/80">Style &amp; conventions</span>
+485:           </div>
+486:           <div class="stat-card p-3 rounded-lg bg-[#161217]/80 border border-[#f7a8a0]/30">
+487:             <span class="stat-label text-[11px] text-[#a595a0]">Quality Verdict</span>
+488:             <div class="stat-value font-mono font-bold text-[#ffd1cc] text-sm mt-1" id="corrector-stat-verdict">-</div>
+489:             <span class="stat-sub text-[10px] text-[#8a7587]" id="corrector-stat-status">Cleanliness</span>
+490:           </div>
+491:         </div>
+492: 
+493:         <!-- AI Quality Review Report Card -->
+494:         <div class="ai-report-card p-4 rounded-xl bg-[#17121b]/90 border border-[#f7a8a0]/25 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+495:           <div class="ai-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#2a1724] border border-[#f7a8a0]/40 text-[10px] font-mono font-semibold text-[#ffd1cc] uppercase tracking-wider mb-3">Senior Engineer Quality Summary</div>
+496:           <div id="corrector-ai-summary" class="markdown-body text-xs text-[#e0e2ed] leading-relaxed"></div>
+497:         </div>
+498: 
+499:         <!-- Structured Findings List -->
+500:         <div class="findings-container p-4 rounded-xl bg-[#17121b]/90 border border-[#e8d5b5]/20">
+501:           <div class="findings-header flex items-center justify-between mb-3">
+502:             <h3 class="font-display font-semibold text-sm text-white">Detailed Static Analysis Findings (<span id="findings-count-badge" class="font-mono text-[#f7a8a0]">0</span>)</h3>
+503:             <span class="findings-engine-pill px-2.5 py-0.5 rounded bg-[#1f1721] border border-[#e8d5b5]/30 font-mono text-[10px] text-[#ded2dc]" id="findings-engine-pill">Engine: Flake8</span>
+504:           </div>
+505:           <div class="findings-list space-y-2 text-xs" id="findings-list"></div>
+506:         </div>
+507:       </div>
+508:     </section>
+509: 
+510:     <!-- Section 1: Describe Your Performance Test Card -->
+511:     <section class="card input-section relative w-full rounded-xl bg-[#120f16]/75 backdrop-blur-xl border border-[#f7a8a0]/15 p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]" id="loadtest-input-section">
+512:       <div class="section-header mb-4">
+513:         <h2 class="font-display text-lg sm:text-xl font-bold tracking-tight mb-1 bg-gradient-to-r from-[#ffd1cc] via-[#f7a8a0] to-[#e0838a] bg-clip-text text-transparent">1. Describe Your Performance Test</h2>
+514:         <p class="section-desc text-xs text-[#baaab4] leading-normal max-w-4xl">Type your goal in plain English. The AI will extract intent, configure ramp patterns, and generate synthetic payloads.</p>
+515:       </div>
+516: 
+517:       <div class="preset-chips flex flex-wrap items-center gap-2 mb-4 text-xs">
+518:         <span class="preset-label text-[#a595a0] font-medium mr-0.5">Quick Presets:</span>
+519:         <button class="chip px-2.5 py-1 rounded-full bg-[#1b141d]/70 hover:bg-[#261c28] border border-[#e8d5b5]/30 hover:border-[#f7e8d0] hover:shadow-[0_0_12px_rgba(243,227,204,0.2)] text-[#ded2dc] text-[11px] transition-all backdrop-blur-md" data-prompt="stress test my heavy endpoint with 200 users for 20 seconds to find breaking point" type="button">Stress (Breaking Point)</button>
+520:         <button class="chip px-2.5 py-1 rounded-full bg-[#1b141d]/70 hover:bg-[#261c28] border border-[#e8d5b5]/30 hover:border-[#f7e8d0] hover:shadow-[0_0_12px_rgba(243,227,204,0.2)] text-[#ded2dc] text-[11px] transition-all backdrop-blur-md" data-prompt="run a baseline health check on my fast endpoint with 10 users for 15 seconds" type="button">Baseline (10 VUs)</button>
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

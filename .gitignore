@@ -46,3 +46,6 @@ tools/bin/*.zip
 *.swo
 Thumbs.db
 .DS_Store
+
+.temp_code/
+node_modules/

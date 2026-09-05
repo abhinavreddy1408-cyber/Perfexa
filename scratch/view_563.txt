@@ -1,0 +1,89 @@
+Created At: 2026-09-06T02:09:54+05:30
+Completed At: 2026-09-06T02:09:54+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 1086
+Total Bytes: 61561
+Showing lines 320 to 400
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+320: 
+321:     // Procedural Saturn-Style Delicate Radial Dust Ring
+322:     function generateRingTexture() {
+323:       const canvas = document.createElement('canvas');
+324:       canvas.width = 512; canvas.height = 512;
+325:       const ctx = canvas.getContext('2d');
+326:       const cx = 256, cy = 256;
+327: 
+328:       ctx.clearRect(0, 0, 512, 512);
+329:       const innerR = 145, outerR = 248;
+330: 
+331:       for (let r = innerR; r <= outerR; r += 1) {
+332:         const t = (r - innerR) / (outerR - innerR);
+333:         // Cassini division gap
+334:         if (t > 0.62 && t < 0.68) continue;
+335: 
+336:         const ripple = 0.5 + 0.5 * Math.sin(t * 140);
+337:         let alpha = 0.20 + 0.45 * ripple;
+338:         if (t < 0.08) alpha *= (t / 0.08);
+339:         if (t > 0.92) alpha *= ((1 - t) / 0.08);
+340: 
+341:         ctx.beginPath();
+342:         ctx.arc(cx, cy, r, 0, Math.PI * 2);
+343:         ctx.strokeStyle = `rgba(247, 168, 160, ${alpha * 0.8})`;
+344:         ctx.lineWidth = 1.3;
+345:         ctx.stroke();
+346:       }
+347:       return new THREE.CanvasTexture(canvas);
+348:     }
+349: 
+350:     // Procedural Companion Moon Textures
+351:     function generateMoonTexture(seed, isRose, w = 256, h = 128) {
+352:       const noiseGen = new SimpleNoise3D(seed);
+353:       const diffCanvas = document.createElement('canvas');
+354:       diffCanvas.width = w; diffCanvas.height = h;
+355:       const diffCtx = diffCanvas.getContext('2d');
+356:       const diffData = diffCtx.createImageData(w, h);
+357: 
+358:       const bumpCanvas = document.createElement('canvas');
+359:       bumpCanvas.width = w; bumpCanvas.height = h;
+360:       const bumpCtx = bumpCanvas.getContext('2d');
+361:       const bumpData = bumpCtx.createImageData(w, h);
+362: 
+363:       for (let y = 0; y < h; y++) {
+364:         const lat = (y / h - 0.5) * Math.PI;
+365:         const cosLat = Math.cos(lat), sinLat = Math.sin(lat);
+366:         for (let x = 0; x < w; x++) {
+367:           const lon = (x / w) * Math.PI * 2;
+368:           const sx = cosLat * Math.cos(lon) * 3.5;
+369:           const sy = sinLat * 3.5;
+370:           const sz = cosLat * Math.sin(lon) * 3.5;
+371: 
+372:           const n = noiseGen.fbm(sx, sy, sz, 4);
+373:           const idx = (y * w + x) * 4;
+374: 
+375:           let r, g, b;
+376:           if (isRose) {
+377:             // Lunar rock with rose-quartz strata
+378:             r = Math.floor(85 + n * 130);
+379:             g = Math.floor(58 + n * 80);
+380:             b = Math.floor(68 + n * 85);
+381:           } else {
+382:             // Warm sandalwood & amber desert satellite
+383:             r = Math.floor(100 + n * 140);
+384:             g = Math.floor(80 + n * 105);
+385:             b = Math.floor(54 + n * 65);
+386:           }
+387: 
+388:           diffData.data[idx] = r;
+389:           diffData.data[idx + 1] = g;
+390:           diffData.data[idx + 2] = b;
+391:           diffData.data[idx + 3] = 255;
+392: 
+393:           const bumpVal = Math.floor(n * 255);
+394:           bumpData.data[idx] = bumpVal;
+395:           bumpData.data[idx + 1] = bumpVal;
+396:           bumpData.data[idx + 2] = bumpVal;
+397:           bumpData.data[idx + 3] = 255;
+398:         }
+399:       }
+400: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

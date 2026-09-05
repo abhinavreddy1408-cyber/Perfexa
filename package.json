@@ -1,0 +1,28 @@
+{
+  "name": "hackthon",
+  "version": "1.0.0",
+  "description": "AutoPerf is an autonomous, end-to-end performance engineering platform that translates natural-language test prompts into structured test intent, generates realistic synthetic payloads, synthesizes verified k6 load-testing scripts, executes real load tests, streams telemetry to a live dashboard, and diagnoses system bottlenecks using AI-driven root-cause analysis.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhinavreddy1408-cyber/Perfexa.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/abhinavreddy1408-cyber/Perfexa/issues"
+  },
+  "homepage": "https://github.com/abhinavreddy1408-cyber/Perfexa#readme",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.10.0"
+  }
+}

@@ -1,0 +1,124 @@
+Created At: 2026-09-06T01:51:30+05:30
+Completed At: 2026-09-06T01:51:30+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 760
+Total Bytes: 48607
+Showing lines 170 to 285
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+170:         const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+171:         ringMesh.rotation.x = Math.PI / 3.4;
+172:         group.add(ringMesh);
+173:         group._ring = ringMesh;
+174:       }
+175: 
+176:       return group;
+177:     }
+178: 
+179:     const floatingNodes = [];
+180: 
+181:     // MINIMAL: Exactly 3 nodes total!
+182:     // 1 Grand Central Globe in the background + 2 subtle peripheral satellites
+183:     const celestialConfigs = [
+184:       // 1. Grand Center Globe (majestic, slow, serene in the upper-mid background behind the hero)
+185:       { x: 0, y: 14, z: -55, size: 24, ring: true, isRose: true, rotY: 0.0022, rotX: 0.001, ringRot: 0.003, floatSpeed: 0.4 },
+186:       // 2. Far Left Satellite (discreet, far out of content view)
+187:       { x: -78, y: 18, z: -35, size: 7.5, ring: true, isRose: false, rotY: -0.0035, rotX: 0.0015, ringRot: -0.004, floatSpeed: 0.55 },
+188:       // 3. Far Right Satellite (discreet, far out of content view)
+189:       { x: 78, y: 14, z: -35, size: 7.0, ring: true, isRose: true, rotY: 0.003, rotX: -0.0015, ringRot: 0.004, floatSpeed: 0.5 }
+190:     ];
+191: 
+192:     celestialConfigs.forEach(cfg => {
+193:       const node = createCelestialNode(cfg.size, cfg.ring, cfg.isRose);
+194:       node.position.set(cfg.x, cfg.y, cfg.z);
+195:       node.userData = {
+196:         baseY: cfg.y,
+197:         rotY: cfg.rotY,
+198:         rotX: cfg.rotX,
+199:         ringRot: cfg.ringRot,
+200:         floatSpeed: cfg.floatSpeed,
+201:         floatOffset: Math.random() * Math.PI * 2
+202:       };
+203:       rootGroup.add(node);
+204:       floatingNodes.push(node);
+205:     });
+206: 
+207:     // Minimal Subtle Ambient Dust (only 40 gentle micro-motes)
+208:     const particleCount = 40;
+209:     const pGeo = new THREE.BufferGeometry();
+210:     const pPos = new Float32Array(particleCount * 3);
+211:     const pVel = [];
+212: 
+213:     for (let i = 0; i < particleCount; i++) {
+214:       pPos[i * 3] = (Math.random() - 0.5) * 200;
+215:       pPos[i * 3 + 1] = (Math.random() - 0.5) * 120;
+216:       pPos[i * 3 + 2] = -40 + (Math.random() - 0.5) * 60;
+217:       pVel.push({
+218:         x: (Math.random() - 0.5) * 0.015,
+219:         y: (Math.random() - 0.5) * 0.015,
+220:         z: (Math.random() - 0.5) * 0.008
+221:       });
+222:     }
+223:     pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+224: 
+225:     const pMat = new THREE.PointsMaterial({
+226:       color: 0xee9ca7,
+227:       size: 1.4,
+228:       transparent: true,
+229:       opacity: 0.4,
+230:       blending: THREE.AdditiveBlending
+231:     });
+232:     const particles = new THREE.Points(pGeo, pMat);
+233:     rootGroup.add(particles);
+234: 
+235:     // Subtle Horizon Floor Grid
+236:     const grid = new THREE.GridHelper(260, 36, 0xd4af37, 0x221118);
+237:     grid.position.y = -50;
+238:     grid.material.transparent = true;
+239:     grid.material.opacity = 0.15;
+240:     scene.add(grid);
+241: 
+242:     const onResize = () => {
+243:       const w = container.clientWidth || window.innerWidth;
+244:       const h = container.clientHeight || window.innerHeight;
+245:       camera.aspect = w / h;
+246:       camera.updateProjectionMatrix();
+247:       renderer.setSize(w, h);
+248:     };
+249:     window.addEventListener('resize', onResize);
+250: 
+251:     // Autonomous, Self-Rotating Smooth Animation Loop
+252:     // Zero mouse / cursor influence - calm, steady, hypnotic rotation
+253:     let clock = new THREE.Clock();
+254: 
+255:     const animate = () => {
+256:       requestAnimationFrame(animate);
+257:       const time = clock.getElapsedTime();
+258: 
+259:       // Autonomous self-rotation on each celestial object
+260:       floatingNodes.forEach(node => {
+261:         // Outer wireframe cage self-rotates
+262:         if (node._cage) {
+263:           node._cage.rotation.y += node.userData.rotY;
+264:           node._cage.rotation.x += node.userData.rotX;
+265:         }
+266:         // Inner core counter-rotates slowly
+267:         if (node._core) {
+268:           node._core.rotation.y -= node.userData.rotY * 0.8;
+269:           node._core.rotation.z += node.userData.rotX * 0.6;
+270:         }
+271:         // Orbital ring self-rotates gracefully
+272:         if (node._ring) {
+273:           node._ring.rotation.z += node.userData.ringRot;
+274:         }
+275:         // Smooth serene vertical floating
+276:         node.position.y = node.userData.baseY + Math.sin(time * node.userData.floatSpeed + node.userData.floatOffset) * 2.0;
+277:       });
+278: 
+279:       // Subtle slow particle drift
+280:       const positions = pGeo.attributes.position.array;
+281:       for (let i = 0; i < particleCount; i++) {
+282:         positions[i * 3] += pVel[i].x;
+283:         positions[i * 3 + 1] += pVel[i].y;
+284:         positions[i * 3 + 2] += pVel[i].z;
+285: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

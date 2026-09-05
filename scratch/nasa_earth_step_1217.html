@@ -1,0 +1,24 @@
+import json
+
+transcript_path = r'C:\Users\abhin\.gemini\antigravity-ide\brain\eca468e2-5e0f-4b9d-994f-c0a00c6acbff\.system_generated\logs\transcript_full.jsonl'
+
+# Look for steps where earth_atmos_4096 appeared
+with open(transcript_path, 'r', encoding='utf-8') as f:
+    for line in f:
+        if 'earth_atmos_4096' in line:
+            obj = json.loads(line)
+            step = obj.get('step_index')
+            stype = obj.get('type')
+            print(f"Step {step}, type {stype}")
+            for tc in obj.get('tool_calls', []):
+                args = tc.get('args', {})
+                name = tc.get('name')
+                print(f"  Tool {name}")
+                if 'CodeContent' in args:
+                    print(f"    CodeContent len: {len(args['CodeContent'])}")
+                    with open(f"scratch/nasa_earth_step_{step}.html", "w", encoding="utf-8") as out:
+                        out.write(args['CodeContent'])
+                if 'ReplacementChunks' in args:
+                    print(f"    ReplacementChunks count: {len(args['ReplacementChunks'])}")
+                if 'ReplacementContent' in args:
+                    print(f"    ReplacementContent len: {len(args['ReplacementContent'])}")

@@ -1,0 +1,29 @@
+Created At: 2026-09-06T02:11:02+05:30
+Completed At: 2026-09-06T02:11:02+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 1086
+Total Bytes: 61622
+Showing lines 595 to 615
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+595:       moonLeftMesh.rotation.x += 0.0006;
+596: 
+597:       moonRightMesh.rotation.y += 0.0018;
+598:       moonRightMesh.rotation.z -= 0.0008;
+599: 
+600:       // Serene vertical breathing floats
+601:       centralPlanetGroup.position.y = 15 + Math.sin(time * 0.35) * 1.6;
+602:       moonLeftGroup.position.y = 18 + Math.sin(time * 0.45 + 1.2) * 1.8;
+603:       moonRightGroup.position.y = 14 + Math.sin(time * 0.40 + 2.5) * 1.8;
+604: 
+605:       // Subtle slow particle drift
+606:       const positions = pGeo.attributes.position.array;
+607:       for (let i = 0; i < particleCount; i++) {
+608:         positions[i * 3] += pVel[i].x;
+609:         positions[i * 3 + 1] += pVel[i].y;
+610:         positions[i * 3 + 2] += pVel[i].z;
+611: 
+612:         if (positions[i * 3] > 100) positions[i * 3] = -100;
+613:         if (positions[i * 3] < -100) positions[i * 3] = 100;
+614:         if (positions[i * 3 + 1] > 60) positions[i * 3 + 1] = -60;
+615:         if (positions[i * 3 + 1] < -60) positions[i * 3 + 1] = 60;
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

@@ -1,0 +1,64 @@
+Created At: 2026-09-06T02:59:09+05:30
+Completed At: 2026-09-06T02:59:09+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 935
+Total Bytes: 62035
+Showing lines 880 to 935
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+880:         window.addEventListener('mouseup', onMouseUp);
+881: 
+882:         // Auto-Rotate Button
+883:         const rotateBtn = document.getElementById('btn-autorotate');
+884:         if (rotateBtn) {
+885:           rotateBtn.addEventListener('click', (e) => {
+886:             e.stopPropagation();
+887:             isRotating = !isRotating;
+888:             if (isRotating) {
+889:               rotateBtn.classList.add('bg-[#f4a6a0]/30', 'text-[#ffd4cf]');
+890:               rotateBtn.classList.remove('bg-white/5', 'text-[#c4b5b8]');
+891:             } else {
+892:               rotateBtn.classList.remove('bg-[#f4a6a0]/30', 'text-[#ffd4cf]');
+893:               rotateBtn.classList.add('bg-white/5', 'text-[#c4b5b8]');
+894:             }
+895:           });
+896:         }
+897: 
+898:         // Reset Button
+899:         const resetBtn = document.getElementById('btn-reset');
+900:         if (resetBtn) {
+901:           resetBtn.addEventListener('click', (e) => {
+902:             e.stopPropagation();
+903:             globeGroup.rotation.set(0.15, 0.2, 0);
+904:           });
+905:         }
+906: 
+907:         // Resize handler
+908:         window.addEventListener('resize', () => {
+909:           if (!container) return;
+910:           camera.aspect = container.clientWidth / container.clientHeight;
+911:           camera.updateProjectionMatrix();
+912:           renderer.setSize(container.clientWidth, container.clientHeight);
+913:         });
+914: 
+915:         // Animation Loop
+916:         const animate = () => {
+917:           requestAnimationFrame(animate);
+918:           if (isRotating && !isDragging) {
+919:             globeGroup.rotation.y += 0.0022;
+920:             ring1.rotation.z += 0.0012;
+921:             ring2.rotation.z -= 0.0016;
+922:           }
+923:           renderer.render(scene, camera);
+924:         };
+925:         globeGroup.rotation.set(0.15, 0.2, 0);
+926:         animate();
+927:       }
+928:     })();
+929:   </script>
+930: 
+931:   <script src="app.js"></script>
+932:   <script src="animations.js"></script>
+933: </body>
+934: </html>
+935: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

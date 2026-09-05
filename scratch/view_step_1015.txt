@@ -1,0 +1,184 @@
+Created At: 2026-09-06T02:48:05+05:30
+Completed At: 2026-09-06T02:48:05+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 795
+Total Bytes: 51267
+Showing lines 130 to 305
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+130:     const starField = new THREE.Points(starGeo, starMat);
+131:     scene.add(starField);
+132: 
+133:     // High-Contrast Cinematic Sun Lighting (Calibrated for photorealistic ACESFilmic tone mapping)
+134:     const sunPosition = new THREE.Vector3(-60, 75, 32);
+135:     const sunLight = new THREE.DirectionalLight(0xffffff, 2.2);
+136:     sunLight.position.copy(sunPosition);
+137:     scene.add(sunLight);
+138: 
+139:     // Cosmic Deep Space Ambient (Provides subtle visibility while preserving black void)
+140:     const ambientLight = new THREE.AmbientLight(0x020512, 0.25);
+141:     scene.add(ambientLight);
+142: 
+143:     // Subtle Starlight Back-Rim (Soft cosmic fill on dark limb)
+144:     const spaceRim = new THREE.DirectionalLight(0x03142e, 0.28);
+145:     spaceRim.position.set(90, -40, -40);
+146:     scene.add(spaceRim);
+147: 
+148:     // Authentic NASA 4K & 2K Ultra-High-Definition Earth Maps
+149:     const textureLoader = new THREE.TextureLoader();
+150:     const cacheBust = 'v=' + Date.now();
+151:     const earthDayMap = textureLoader.load('assets/earth/earth_atmos_4096.jpg?' + cacheBust);
+152:     const earthCloudsMap = textureLoader.load('assets/earth/earth_clouds_2048.png?' + cacheBust);
+153:     const earthNormalMap = textureLoader.load('assets/earth/earth_normal_2048.jpg?' + cacheBust);
+154:     const earthSpecMap = textureLoader.load('assets/earth/earth_specular_2048.jpg?' + cacheBust);
+155:     const earthNightMap = textureLoader.load('assets/earth/earth_lights_2048.png?' + cacheBust);
+156: 
+157:     // Enable 16x Anisotropic Hardware Filtering for Tack-Sharp Grazing-Angle Detail
+158:     const maxAniso = renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 8;
+159:     [earthDayMap, earthCloudsMap, earthNormalMap, earthSpecMap, earthNightMap].forEach(tex => {
+160:       tex.generateMipmaps = true;
+161:       tex.minFilter = THREE.LinearMipmapLinearFilter;
+162:       tex.magFilter = THREE.LinearFilter;
+163:       tex.anisotropy = maxAniso;
+164:     });
+165: 
+166:     // Grand Orbital Earth Horizon Composition (Matches Reference Image)
+167:     // Curvature sweeps gracefully from bottom-left to upper-right
+168:     const earthGroup = new THREE.Group();
+169:     const earthRadius = 74;
+170:     earthGroup.position.set(32, -54, -16);
+171:     rootGroup.add(earthGroup);
+172: 
+173:     // Sun direction vector in view space for seamless day/night masking
+174:     const sunDirWorld = sunPosition.clone().sub(earthGroup.position).normalize();
+175:     const sunUniformView = { value: new THREE.Vector3() };
+176:     const updateSunView = () => {
+177:       sunUniformView.value.copy(sunDirWorld).applyQuaternion(camera.quaternion.clone().invert()).normalize();
+178:     };
+179:     updateSunView();
+180: 
+181:     // 1. Earth Solid Surface with Deep Sapphire Oceans & Authentic Continents (4K NASA Blue Marble)
+182:     const earthGeo = new THREE.SphereGeometry(earthRadius, 128, 128);
+183:     const earthMat = new THREE.MeshPhongMaterial({
+184:       map: earthDayMap,
+185:       normalMap: earthNormalMap,
+186:       normalScale: new THREE.Vector2(0.85, 0.85),
+187:       specularMap: earthSpecMap,
+188:       shininess: 32,
+189:       specular: new THREE.Color(0x285599),
+190:       emissiveMap: earthNightMap,
+191:       emissive: new THREE.Color(0xffaa55),
+192:       emissiveIntensity: 0.95
+193:     });
+194: 
+195:     // Mask city lights on night side & add subtle Rayleigh atmospheric surface wash on day limb
+196:     earthMat.onBeforeCompile = (shader) => {
+197:       shader.uniforms.uSunDirView = sunUniformView;
+198:       shader.fragmentShader = shader.fragmentShader.replace(
+199:         '#include <common>',
+200:         `#include <common>
+201:          uniform vec3 uSunDirView;`
+202:       );
+203:       shader.fragmentShader = shader.fragmentShader.replace(
+204:         '#include <emissivemap_fragment>',
+205:         `#include <emissivemap_fragment>
+206:          vec3 viewN = normalize(vNormal);
+207:          float dayDot = dot(viewN, uSunDirView);
+208:          float nightMask = 1.0 - smoothstep(-0.15, 0.25, dayDot);
+209:          totalEmissiveRadiance *= nightMask * 1.5;
+210: 
+211:          // Subtle atmospheric surface haze grazing only the day limb
+212:          vec3 viewDir = normalize(-vViewPosition);
+213:          float rim = 1.0 - max(0.0, dot(viewN, viewDir));
+214:          float limbHaze = pow(rim, 5.0);
+215:          float sunFactor = smoothstep(-0.2, 0.45, dayDot);
+216:          vec3 atmoHaze = vec3(0.01, 0.40, 0.95);
+217:          totalEmissiveRadiance += atmoHaze * limbHaze * sunFactor * 0.35;`
+218:       );
+219:     };
+220: 
+221:     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+222:     earthMesh.rotation.x = THREE.MathUtils.degToRad(-22);
+223:     earthMesh.rotation.z = THREE.MathUtils.degToRad(18);
+224:     earthMesh.rotation.y = THREE.MathUtils.degToRad(195);
+225:     earthGroup.add(earthMesh);
+226: 
+227:     // 2. High-Resolution 2K Swirling Atmospheric Cloud Layer (Native 32-Bit RGBA Alpha Transparency)
+228:     const cloudGeo = new THREE.SphereGeometry(earthRadius * 1.008, 128, 128);
+229:     const cloudMat = new THREE.MeshPhongMaterial({
+230:       map: earthCloudsMap,
+231:       transparent: true,
+232:       opacity: 0.90,
+233:       blending: THREE.NormalBlending,
+234:       depthWrite: false,
+235:       shininess: 0,
+236:       specular: new THREE.Color(0x000000)
+237:     });
+238:     const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+239:     cloudMesh.rotation.x = THREE.MathUtils.degToRad(-22);
+240:     cloudMesh.rotation.z = THREE.MathUtils.degToRad(18);
+241:     cloudMesh.rotation.y = THREE.MathUtils.degToRad(195);
+242:     earthGroup.add(cloudMesh);
+243: 
+244:     // 3. Radiant Rayleigh Scattering Atmospheric Limb Glow (FrontSide Fresnel with Sunlit Rim Glint)
+245:     // Matches Reference Photo: Electric Azure/Cyan halo along the curved horizon
+246:     const atmoGeo = new THREE.SphereGeometry(earthRadius * 1.015, 128, 128);
+247:     const atmoMat = new THREE.ShaderMaterial({
+248:       vertexShader: `
+249:         varying vec3 vNormal;
+250:         varying vec3 vViewPosition;
+251:         varying vec3 vWorldPosition;
+252:         void main() {
+253:           vNormal = normalize(normalMatrix * normal);
+254:           vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+255:           vViewPosition = -mvPosition.xyz;
+256:           vec4 worldPos = modelMatrix * vec4(position, 1.0);
+257:           vWorldPosition = worldPos.xyz;
+258:           gl_Position = projectionMatrix * mvPosition;
+259:         }
+260:       `,
+261:       fragmentShader: `
+262:         varying vec3 vNormal;
+263:         varying vec3 vViewPosition;
+264:         varying vec3 vWorldPosition;
+265:         uniform vec3 uSunPosition;
+266:         uniform vec3 uEarthCenter;
+267: 
+268:         void main() {
+269:           vec3 normal = normalize(vNormal);
+270:           vec3 viewDir = normalize(vViewPosition);
+271:           float rim = 1.0 - max(0.0, dot(normal, viewDir));
+272:           if (rim <= 0.0) discard;
+273: 
+274:           // Razor-sharp exponential Rayleigh limb glow hugging the horizon
+275:           float intensity = pow(rim, 3.8);
+276: 
+277:           // Sunlight illumination factor
+278:           vec3 sunDir = normalize(uSunPosition - uEarthCenter);
+279:           vec3 atmoNormal = normalize(vWorldPosition - uEarthCenter);
+280:           float sunDot = dot(atmoNormal, sunDir);
+281:           float sunFactor = smoothstep(-0.2, 0.45, sunDot);
+282: 
+283:           // Electric cyan / deep sapphire Rayleigh gradient
+284:           vec3 deepBlue = vec3(0.01, 0.28, 0.96);
+285:           vec3 brightCyan = vec3(0.10, 0.82, 1.0);
+286:           vec3 specularGlint = vec3(0.92, 0.98, 1.0);
+287: 
+288:           vec3 atmoColor = mix(deepBlue, brightCyan, pow(rim, 1.5));
+289:           // Sunlit forward-scatter specular highlight on the outermost horizon ribbon
+290:           atmoColor = mix(atmoColor, specularGlint, pow(rim, 4.5) * sunFactor * 0.8);
+291: 
+292:           float alpha = intensity * (sunFactor * 3.4 + 0.02);
+293:           gl_FragColor = vec4(atmoColor, clamp(alpha, 0.0, 1.0));
+294:         }
+295:       `,
+296:       uniforms: {
+297:         uSunPosition: { value: sunPosition },
+298:         uEarthCenter: { value: earthGroup.position }
+299:       },
+300:       blending: THREE.AdditiveBlending,
+301:       side: THREE.FrontSide,
+302:       transparent: true,
+303:       depthWrite: false
+304:     });
+305:     const atmoMesh = new THREE.Mesh(atmoGeo, atmoMat);
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

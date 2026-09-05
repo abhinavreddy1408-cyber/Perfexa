@@ -333,6 +333,21 @@ class NimClient:
             _log_raw_call(model, messages, raw, 0.05, status="mock_success")
             return raw
 
+        # Code review summary fallback
+        if "static analysis" in user_prompt.lower() or "senior software engineer" in messages[0].get("content", "").lower():
+            import re as _re
+            fname = _re.search(r"Filename:\s*([^\n]+)", user_prompt)
+            filename = fname.group(1).strip() if fname else "code file"
+            issues = _re.search(r"Total Issues Found:\s*(\d+)", user_prompt)
+            count = int(issues.group(1)) if issues else 0
+
+            if count == 0:
+                report = f"The source file '{filename}' passed static analysis cleanly with zero defects or style violations detected. The codebase exhibits exemplary adherence to language standards and best practices. Continue maintaining these rigorous quality standards across the rest of the repository."
+            else:
+                report = f"Static analysis for '{filename}' revealed {count} issue(s) that require attention. The primary concern is resolving undefined variables and unused dependencies to prevent unexpected runtime errors. Once these core issues are resolved, addressing formatting and style conventions will ensure clean long-term maintainability."
+            _log_raw_call(model, messages, report, 0.05, status="mock_success")
+            return report
+
         # Summary generation fallback — metrics-driven, no fabricated infrastructure claims
         if "summary" in messages[0].get("content", "").lower() or "report" in messages[0].get("content", "").lower():
             import re as _re

@@ -1,0 +1,34 @@
+Created At: 2026-09-06T02:13:15+05:30
+Completed At: 2026-09-06T02:13:15+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 1086
+Total Bytes: 61622
+Showing lines 610 to 635
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+610:         positions[i * 3 + 2] += pVel[i].z;
+611: 
+612:         if (positions[i * 3] > 100) positions[i * 3] = -100;
+613:         if (positions[i * 3] < -100) positions[i * 3] = 100;
+614:         if (positions[i * 3 + 1] > 60) positions[i * 3 + 1] = -60;
+615:         if (positions[i * 3 + 1] < -60) positions[i * 3 + 1] = 60;
+616:       }
+617:       pGeo.attributes.position.needsUpdate = true;
+618: 
+619:       // Faint horizon floor grid drift
+620:       grid.position.z = (time * 1.5) % 6 - 50;
+621: 
+622:       renderer.render(scene, camera);
+623:     };
+624:     animate();
+625:   })();
+626:   </script>
+627: 
+628:   <!-- Ambient Luxury Glows (Rose Gold & Warm Amber) -->
+629:   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+630:     <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[760px] h-[380px] bg-gradient-to-b from-[#f7a8a0]/15 to-[#e0838a]/5 blur-[140px] rounded-full"></div>
+631:     <div class="absolute top-[380px] -left-32 w-[520px] h-[460px] bg-[#d4af37]/10 blur-[150px] rounded-full"></div>
+632:     <div class="absolute bottom-10 right-0 w-[580px] h-[420px] bg-[#f4a6a0]/12 blur-[140px] rounded-full"></div>
+633:   </div>
+634: 
+635:   <!-- Top Navigation Bar -->
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

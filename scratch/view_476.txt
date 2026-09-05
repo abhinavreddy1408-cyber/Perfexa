@@ -1,0 +1,54 @@
+Created At: 2026-09-06T01:49:25+05:30
+Completed At: 2026-09-06T01:49:25+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 858
+Total Bytes: 53254
+Showing lines 350 to 395
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+350:         if (obj.userData.rotSpeedX) {
+351:           obj.rotation.x += obj.userData.rotSpeedX;
+352:           obj.rotation.y += obj.userData.rotSpeedY;
+353:           if (obj._ring) {
+354:             obj._ring.rotation.z += 0.018;
+355:             obj._ring.rotation.x = Math.PI / 3.2 + Math.sin(time * 1.2 + obj.userData.floatOffset) * 0.15;
+356:           }
+357:         } else {
+358:           obj.rotation.x += obj.userData.rotX;
+359:           obj.rotation.y += obj.userData.rotY;
+360:         }
+361: 
+362:         // Harmonic dual-wave floating for ultra-smooth fluid motion
+363:         const wave = Math.sin(time * obj.userData.floatSpeed + obj.userData.floatOffset) * 3.8 +
+364:                      Math.cos(time * obj.userData.floatSpeed * 0.6 + obj.userData.floatOffset) * 1.4;
+365: 
+366:         // Interactive cursor proximity reaction
+367:         const cursorWorldX = mouseX * 70;
+368:         const cursorWorldY = -mouseY * 45;
+369:         const distToCursor = Math.hypot(cursorWorldX - obj.position.x, cursorWorldY - obj.position.y);
+370:         const nudgeX = distToCursor < 50 ? (1 - distToCursor / 50) * (cursorWorldX - obj.position.x) * 0.15 : 0;
+371:         const nudgeY = distToCursor < 50 ? (1 - distToCursor / 50) * (cursorWorldY - obj.position.y) * 0.15 : 0;
+372: 
+373:         obj.position.x += (obj.userData.baseX + nudgeX - obj.position.x) * (4.5 * delta);
+374:         obj.position.y += (obj.userData.baseY + wave + nudgeY - obj.position.y) * (4.5 * delta);
+375:       });
+376: 
+377:       // 5. Constellation Particles Floating
+378:       const positions = pGeo.attributes.position.array;
+379:       for (let i = 0; i < particleCount; i++) {
+380:         positions[i * 3] += pVel[i].x;
+381:         positions[i * 3 + 1] += pVel[i].y;
+382:         positions[i * 3 + 2] += pVel[i].z;
+383: 
+384:         if (positions[i * 3] > 100) positions[i * 3] = -100;
+385:         if (positions[i * 3] < -100) positions[i * 3] = 100;
+386:         if (positions[i * 3 + 1] > 60) positions[i * 3 + 1] = -60;
+387:         if (positions[i * 3 + 1] < -60) positions[i * 3 + 1] = 60;
+388:       }
+389:       pGeo.attributes.position.needsUpdate = true;
+390: 
+391:       // 6. Horizon Floor Grid Movement
+392:       grid.position.z = (time * 6.5) % 6 - 48;
+393: 
+394:       renderer.render(scene, camera);
+395:     };
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

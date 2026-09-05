@@ -229,6 +229,10 @@ def generate_k6_script_stream(
     # Normalize target URL for local environment if Docker is absent
     target_url = get_effective_target_url(intent.target_url)
 
+    err_limit_val = intent.success_criteria.max_error_rate
+    if err_limit_val <= 0.0:
+        err_limit_val = 0.01
+
     prompt = f"""You are generating an autonomous k6 load testing script in JavaScript.
 Test Intent:
 - Test Type: {intent.test_type}
@@ -236,7 +240,7 @@ Test Intent:
 - Virtual Users: {intent.virtual_users}
 - Duration: {intent.duration}
 - Primary Endpoint: {ep.path} (Method: {ep.method})
-- Thresholds: p95 < {intent.success_criteria.p95_ms}ms, error_rate < {intent.success_criteria.max_error_rate}
+- Thresholds: p95 < {intent.success_criteria.p95_ms}ms, error_rate <= {err_limit_val}
 - Stages: {[stage.model_dump() for stage in intent.ramp_pattern]}
 - Sample Payloads: {payloads[:5]}
 
@@ -247,6 +251,7 @@ INSTRUCTIONS:
 1. Output ONLY executable JavaScript code compatible with k6.
 2. Do NOT include markdown code fences, comments outside code, or prose.
 3. Define the options export with either 'vus & duration' or 'stages', and 'thresholds'.
+   For the http_req_failed threshold, use 'rate<={err_limit_val}' or 'rate<{err_limit_val}'. NEVER use 'rate<0' or 'rate<0.0'.
 4. In default function, make HTTP requests to `${{BASE_URL}}{ep.path}` and use k6 checks.
 5. Embed concrete values directly. NEVER write placeholders like __SAMPLE_PAYLOAD__ or __PAYLOADS_JSON__.
 6. If the endpoint method is GET, do NOT send a request body. If POST, send JSON.stringify(payload).

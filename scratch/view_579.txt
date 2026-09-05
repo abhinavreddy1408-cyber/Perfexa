@@ -1,0 +1,199 @@
+Created At: 2026-09-06T02:10:23+05:30
+Completed At: 2026-09-06T02:10:23+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 1086
+Total Bytes: 61561
+Showing lines 160 to 350
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+160:           freq *= 2;
+161:           amp *= 0.5;
+162:         }
+163:         return (total / maxAmp + 1) * 0.5;
+164:       }
+165:     }
+166: 
+167:     // Procedural Planet Textures (Diffuse, Bump, Roughness, Emissive Night Lights)
+168:     function generatePlanetTextures(w = 512, h = 256) {
+169:       const noiseGen = new SimpleNoise3D(17);
+170:       
+171:       const diffCanvas = document.createElement('canvas');
+172:       diffCanvas.width = w; diffCanvas.height = h;
+173:       const diffCtx = diffCanvas.getContext('2d');
+174:       const diffData = diffCtx.createImageData(w, h);
+175: 
+176:       const bumpCanvas = document.createElement('canvas');
+177:       bumpCanvas.width = w; bumpCanvas.height = h;
+178:       const bumpCtx = bumpCanvas.getContext('2d');
+179:       const bumpData = bumpCtx.createImageData(w, h);
+180: 
+181:       const roughCanvas = document.createElement('canvas');
+182:       roughCanvas.width = w; roughCanvas.height = h;
+183:       const roughCtx = roughCanvas.getContext('2d');
+184:       const roughData = roughCtx.createImageData(w, h);
+185: 
+186:       const emissCanvas = document.createElement('canvas');
+187:       emissCanvas.width = w; emissCanvas.height = h;
+188:       const emissCtx = emissCanvas.getContext('2d');
+189:       const emissData = emissCtx.createImageData(w, h);
+190: 
+191:       for (let y = 0; y < h; y++) {
+192:         const lat = (y / h - 0.5) * Math.PI;
+193:         const cosLat = Math.cos(lat), sinLat = Math.sin(lat);
+194:         for (let x = 0; x < w; x++) {
+195:           const lon = (x / w) * Math.PI * 2;
+196:           const sx = cosLat * Math.cos(lon) * 2.5;
+197:           const sy = sinLat * 2.5;
+198:           const sz = cosLat * Math.sin(lon) * 2.5;
+199: 
+200:           const n = noiseGen.fbm(sx, sy, sz, 5);
+201:           const idx = (y * w + x) * 4;
+202: 
+203:           let r = 0, g = 0, b = 0;
+204:           let bump = 0;
+205:           let rough = 200;
+206:           let emR = 0, emG = 0, emB = 0;
+207: 
+208:           if (n < 0.46) {
+209:             // Deep obsidian / midnight sea
+210:             const oceanDepth = n / 0.46;
+211:             r = Math.floor(12 + oceanDepth * 12);
+212:             g = Math.floor(9 + oceanDepth * 10);
+213:             b = Math.floor(22 + oceanDepth * 18);
+214:             bump = 15;
+215:             rough = 35; // Glossy specular reflection on liquid
+216:           } else if (n < 0.52) {
+217:             // Shoreline / lowlands (warm bronze / rosewood)
+218:             const t = (n - 0.46) / 0.06;
+219:             r = Math.floor(65 + t * 45);
+220:             g = Math.floor(32 + t * 25);
+221:             b = Math.floor(45 + t * 30);
+222:             bump = Math.floor(40 + t * 40);
+223:             rough = 140;
+224:           } else if (n < 0.70) {
+225:             // Continental highlands (rose gold & terracotta terrain)
+226:             const t = (n - 0.52) / 0.18;
+227:             r = Math.floor(110 + t * 115);
+228:             g = Math.floor(58 + t * 75);
+229:             b = Math.floor(75 + t * 70);
+230:             bump = Math.floor(80 + t * 110);
+231:             rough = 210;
+232: 
+233:             // Subtle city / telemetry grid points along coastlines
+234:             if (n < 0.60 && ((x * 13 + y * 29) % 37 === 0)) {
+235:               emR = 252;
+236:               emG = 185;
+237:               emB = 170;
+238:             }
+239:           } else {
+240:             // Mountain peaks (crystalline quartz / snow ridges)
+241:             const t = Math.min(1, (n - 0.70) / 0.15);
+242:             r = Math.floor(225 + t * 30);
+243:             g = Math.floor(135 + t * 85);
+244:             b = Math.floor(145 + t * 75);
+245:             bump = Math.floor(190 + t * 65);
+246:             rough = 240;
+247:           }
+248: 
+249:           diffData.data[idx] = r;
+250:           diffData.data[idx + 1] = g;
+251:           diffData.data[idx + 2] = b;
+252:           diffData.data[idx + 3] = 255;
+253: 
+254:           bumpData.data[idx] = bump;
+255:           bumpData.data[idx + 1] = bump;
+256:           bumpData.data[idx + 2] = bump;
+257:           bumpData.data[idx + 3] = 255;
+258: 
+259:           roughData.data[idx] = rough;
+260:           roughData.data[idx + 1] = rough;
+261:           roughData.data[idx + 2] = rough;
+262:           roughData.data[idx + 3] = 255;
+263: 
+264:           emissData.data[idx] = emR;
+265:           emissData.data[idx + 1] = emG;
+266:           emissData.data[idx + 2] = emB;
+267:           emissData.data[idx + 3] = 255;
+268:         }
+269:       }
+270: 
+271:       diffCtx.putImageData(diffData, 0, 0);
+272:       bumpCtx.putImageData(bumpData, 0, 0);
+273:       roughCtx.putImageData(roughData, 0, 0);
+274:       emissCtx.putImageData(emissData, 0, 0);
+275: 
+276:       return {
+277:         diffuse: new THREE.CanvasTexture(diffCanvas),
+278:         bump: new THREE.CanvasTexture(bumpCanvas),
+279:         roughness: new THREE.CanvasTexture(roughCanvas),
+280:         emissive: new THREE.CanvasTexture(emissCanvas)
+281:       };
+282:     }
+283: 
+284:     // Procedural Atmospheric Swirling Clouds
+285:     function generateCloudTexture(w = 512, h = 256) {
+286:       const cloudGen = new SimpleNoise3D(99);
+287:       const canvas = document.createElement('canvas');
+288:       canvas.width = w; canvas.height = h;
+289:       const ctx = canvas.getContext('2d');
+290:       const imgData = ctx.createImageData(w, h);
+291: 
+292:       for (let y = 0; y < h; y++) {
+293:         const lat = (y / h - 0.5) * Math.PI;
+294:         const cosLat = Math.cos(lat), sinLat = Math.sin(lat);
+295:         const band = Math.sin(lat * 7.0) * 0.12 + Math.cos(lat * 14.0) * 0.06;
+296: 
+297:         for (let x = 0; x < w; x++) {
+298:           const lon = (x / w) * Math.PI * 2;
+299:           const sx = cosLat * Math.cos(lon) * 3.2;
+300:           const sy = sinLat * 1.8;
+301:           const sz = cosLat * Math.sin(lon) * 3.2;
+302: 
+303:           const n = cloudGen.fbm(sx, sy, sz, 4) + band;
+304:           const idx = (y * w + x) * 4;
+305: 
+306:           if (n > 0.48) {
+307:             const alpha = Math.min(255, Math.floor((n - 0.48) / 0.35 * 215));
+308:             imgData.data[idx] = 252;
+309:             imgData.data[idx + 1] = 236;
+310:             imgData.data[idx + 2] = 240;
+311:             imgData.data[idx + 3] = alpha;
+312:           } else {
+313:             imgData.data[idx + 3] = 0;
+314:           }
+315:         }
+316:       }
+317:       ctx.putImageData(imgData, 0, 0);
+318:       return new THREE.CanvasTexture(canvas);
+319:     }
+320: 
+321:     // Procedural Saturn-Style Delicate Radial Dust Ring
+322:     function generateRingTexture() {
+323:       const canvas = document.createElement('canvas');
+324:       canvas.width = 512; canvas.height = 512;
+325:       const ctx = canvas.getContext('2d');
+326:       const cx = 256, cy = 256;
+327: 
+328:       ctx.clearRect(0, 0, 512, 512);
+329:       const innerR = 145, outerR = 248;
+330: 
+331:       for (let r = innerR; r <= outerR; r += 1) {
+332:         const t = (r - innerR) / (outerR - innerR);
+333:         // Cassini division gap
+334:         if (t > 0.62 && t < 0.68) continue;
+335: 
+336:         const ripple = 0.5 + 0.5 * Math.sin(t * 140);
+337:         let alpha = 0.20 + 0.45 * ripple;
+338:         if (t < 0.08) alpha *= (t / 0.08);
+339:         if (t > 0.92) alpha *= ((1 - t) / 0.08);
+340: 
+341:         ctx.beginPath();
+342:         ctx.arc(cx, cy, r, 0, Math.PI * 2);
+343:         ctx.strokeStyle = `rgba(247, 168, 160, ${alpha * 0.8})`;
+344:         ctx.lineWidth = 1.3;
+345:         ctx.stroke();
+346:       }
+347:       return new THREE.CanvasTexture(canvas);
+348:     }
+349: 
+350:     // Procedural Companion Moon Textures
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

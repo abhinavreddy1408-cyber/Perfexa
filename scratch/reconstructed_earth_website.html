@@ -1,0 +1,229 @@
+    const rootGroup = new THREE.Group();
+    scene.add(rootGroup);
+
+    // High-Precision Multi-Magnitude Deep Space Starfield
+    const starCount = 460;
+    const starGeo = new THREE.BufferGeometry();
+    const starPos = new Float32Array(starCount * 3);
+    const starColors = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      starPos[i * 3] = (Math.random() - 0.5) * 460;
+      starPos[i * 3 + 1] = (Math.random() - 0.5) * 320;
+      starPos[i * 3 + 2] = -90 - Math.random() * 150;
+
+      // Realistic astronomical color variations: ice-blue, pure white, and soft stellar gold
+      const r = Math.random();
+      if (r < 0.25) {
+        starColors[i * 3] = 0.82; starColors[i * 3 + 1] = 0.92; starColors[i * 3 + 2] = 1.0; // Ice blue
+      } else if (r < 0.85) {
+        starColors[i * 3] = 0.96; starColors[i * 3 + 1] = 0.98; starColors[i * 3 + 2] = 1.0; // Crisp white
+      } else {
+        starColors[i * 3] = 1.0; starColors[i * 3 + 1] = 0.94; starColors[i * 3 + 2] = 0.85; // Warm stellar
+      }
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+    const starMat = new THREE.PointsMaterial({
+      size: 0.88,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.78,
+      sizeAttenuation: true
+    });
+    const starField = new THREE.Points(starGeo, starMat);
+    scene.add(starField);
+
+    // High-Contrast Cinematic Sun Lighting (Calibrated for photorealistic ACESFilmic tone mapping)
+    const sunPosition = new THREE.Vector3(-60, 75, 32);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 2.2);
+    sunLight.position.copy(sunPosition);
+    scene.add(sunLight);
+
+    // Cosmic Deep Space Ambient (Provides subtle visibility while preserving black void)
+    const ambientLight = new THREE.AmbientLight(0x020512, 0.25);
+    scene.add(ambientLight);
+
+    // Subtle Starlight Back-Rim (Soft cosmic fill on dark limb)
+    const spaceRim = new THREE.DirectionalLight(0x03142e, 0.28);
+    spaceRim.position.set(90, -40, -40);
+    scene.add(spaceRim);
+
+    // Authentic NASA 4K & 2K Ultra-High-Definition Earth Maps
+    const textureLoader = new THREE.TextureLoader();
+    const cacheBust = 'v=' + Date.now();
+    const earthDayMap = textureLoader.load('assets/earth/earth_atmos_4096.jpg?' + cacheBust);
+    const earthCloudsMap = textureLoader.load('assets/earth/earth_clouds_2048.png?' + cacheBust);
+    const earthNormalMap = textureLoader.load('assets/earth/earth_normal_2048.jpg?' + cacheBust);
+    const earthSpecMap = textureLoader.load('assets/earth/earth_specular_2048.jpg?' + cacheBust);
+    const earthNightMap = textureLoader.load('assets/earth/earth_lights_2048.png?' + cacheBust);
+
+    // Enable 16x Anisotropic Hardware Filtering for Tack-Sharp Grazing-Angle Detail
+    const maxAniso = renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 8;
+    [earthDayMap, earthCloudsMap, earthNormalMap, earthSpecMap, earthNightMap].forEach(tex => {
+      tex.generateMipmaps = true;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.anisotropy = maxAniso;
+    });
+
+    // Grand Orbital Earth Horizon Composition (Matches Reference Image)
+    // Curvature sweeps gracefully from bottom-left to upper-right
+    const earthGroup = new THREE.Group();
+    const earthRadius = 74;
+    earthGroup.position.set(32, -54, -16);
+    rootGroup.add(earthGroup);
+
+    // Sun direction vector in view space for seamless day/night masking
+    const sunDirWorld = sunPosition.clone().sub(earthGroup.position).normalize();
+    const sunUniformView = { value: new THREE.Vector3() };
+    const updateSunView = () => {
+      sunUniformView.value.copy(sunDirWorld).applyQuaternion(camera.quaternion.clone().invert()).normalize();
+    };
+    updateSunView();
+
+    // 1. Earth Solid Surface with Deep Sapphire Oceans & Authentic Continents (4K NASA Blue Marble)
+    const earthGeo = new THREE.SphereGeometry(earthRadius, 128, 128);
+    const earthMat = new THREE.MeshPhongMaterial({
+      map: earthDayMap,
+      normalMap: earthNormalMap,
+      normalScale: new THREE.Vector2(0.85, 0.85),
+      specularMap: earthSpecMap,
+      shininess: 32,
+      specular: new THREE.Color(0x285599),
+      emissiveMap: earthNightMap,
+      emissive: new THREE.Color(0xffaa55),
+      emissiveIntensity: 0.95
+    });
+
+    // Mask city lights on night side & add subtle Rayleigh atmospheric surface wash on day limb
+    earthMat.onBeforeCompile = (shader) => {
+      shader.uniforms.uSunDirView = sunUniformView;
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <common>',
+        `#include <common>
+         uniform vec3 uSunDirView;`
+      );
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+         vec3 viewN = normalize(vNormal);
+         float dayDot = dot(viewN, uSunDirView);
+         float nightMask = 1.0 - smoothstep(-0.15, 0.25, dayDot);
+         totalEmissiveRadiance *= nightMask * 1.5;
+
+         // Subtle atmospheric surface haze grazing only the day limb
+         vec3 viewDir = normalize(-vViewPosition);
+         float rim = 1.0 - max(0.0, dot(viewN, viewDir));
+         float limbHaze = pow(rim, 5.0);
+         float sunFactor = smoothstep(-0.2, 0.45, dayDot);
+         vec3 atmoHaze = vec3(0.01, 0.40, 0.95);
+         totalEmissiveRadiance += atmoHaze * limbHaze * sunFactor * 0.35;`
+      );
+    };
+
+    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+    earthMesh.rotation.x = THREE.MathUtils.degToRad(-22);
+    earthMesh.rotation.z = THREE.MathUtils.degToRad(18);
+    earthMesh.rotation.y = THREE.MathUtils.degToRad(195);
+    earthGroup.add(earthMesh);
+
+    // 2. High-Resolution 2K Swirling Atmospheric Cloud Layer (Native 32-Bit RGBA Alpha Transparency)
+    const cloudGeo = new THREE.SphereGeometry(earthRadius * 1.008, 128, 128);
+    const cloudMat = new THREE.MeshPhongMaterial({
+      map: earthCloudsMap,
+      transparent: true,
+      opacity: 0.90,
+      blending: THREE.NormalBlending,
+      depthWrite: false,
+      shininess: 0,
+      specular: new THREE.Color(0x000000)
+    });
+    const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+    cloudMesh.rotation.x = THREE.MathUtils.degToRad(-22);
+    cloudMesh.rotation.z = THREE.MathUtils.degToRad(18);
+    cloudMesh.rotation.y = THREE.MathUtils.degToRad(195);
+    earthGroup.add(cloudMesh);
+
+    // 3. Radiant Rayleigh Scattering Atmospheric Limb Glow (FrontSide Fresnel with Sunlit Rim Glint)
+    // Matches Reference Photo: Electric Azure/Cyan halo along the curved horizon
+    const atmoGeo = new THREE.SphereGeometry(earthRadius * 1.015, 128, 128);
+    const atmoMat = new THREE.ShaderMaterial({
+      vertexShader: `
+        varying vec3 vNormal;
+        varying vec3 vViewPosition;
+        varying vec3 vWorldPosition;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          vViewPosition = -mvPosition.xyz;
+          vec4 worldPos = modelMatrix * vec4(position, 1.0);
+          vWorldPosition = worldPos.xyz;
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vNormal;
+        varying vec3 vViewPosition;
+        varying vec3 vWorldPosition;
+        uniform vec3 uSunPosition;
+        uniform vec3 uEarthCenter;
+
+        void main() {
+          vec3 normal = normalize(vNormal);
+          vec3 viewDir = normalize(vViewPosition);
+          float rim = 1.0 - max(0.0, dot(normal, viewDir));
+          if (rim <= 0.0) discard;
+
+          // Razor-sharp exponential Rayleigh limb glow hugging the horizon
+          float intensity = pow(rim, 3.8);
+
+          // Sunlight illumination factor
+          vec3 sunDir = normalize(uSunPosition - uEarthCenter);
+          vec3 atmoNormal = normalize(vWorldPosition - uEarthCenter);
+          float sunDot = dot(atmoNormal, sunDir);
+          float sunFactor = smoothstep(-0.2, 0.45, sunDot);
+
+          // Electric cyan / deep sapphire Rayleigh gradient
+          vec3 deepBlue = vec3(0.01, 0.28, 0.96);
+          vec3 brightCyan = vec3(0.10, 0.82, 1.0);
+          vec3 specularGlint = vec3(0.92, 0.98, 1.0);
+
+          vec3 atmoColor = mix(deepBlue, brightCyan, pow(rim, 1.5));
+          // Sunlit forward-scatter specular highlight on the outermost horizon ribbon
+          atmoColor = mix(atmoColor, specularGlint, pow(rim, 4.5) * sunFactor * 0.8);
+
+          float alpha = intensity * (sunFactor * 3.4 + 0.02);
+          gl_FragColor = vec4(atmoColor, clamp(alpha, 0.0, 1.0));
+        }
+      `,
+      uniforms: {
+        uSunPosition: { value: sunPosition },
+        uEarthCenter: { value: earthGroup.position }
+      },
+      blending: THREE.AdditiveBlending,
+      side: THREE.FrontSide,
+      transparent: true,
+      depthWrite: false
+    });
+    const atmoMesh = new THREE.Mesh(atmoGeo, atmoMat);
+    earthGroup.add(atmoMesh);
+
+    const onResize = () => {
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    };
+    window.addEventListener('resize', onResize);
+      <div class="hero-section flex flex-col items-start max-w-2xl">
+        <div class="hero-badge inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#1b141d]/70 border border-[#f7a8a0]/30 backdrop-blur-md mb-3 shadow-[0_0_15px_rgba(247,168,160,0.12)]">
+          <span class="font-mono text-[10px] tracking-wider uppercase font-semibold text-[#ffd1cc]">AUTONOMOUS LOAD TESTING &amp; INTELLIGENT TELEMETRY</span>
+        </div>
+        <h1 class="hero-title font-display text-3xl sm:text-4xl lg:text-[44px] font-bold tracking-tight leading-[1.15] mb-2.5 bg-gradient-to-r from-[#ffd1cc] via-[#f7a8a0] to-[#e0838a] bg-clip-text text-transparent drop-shadow-[0_2px_18px_rgba(247,168,160,0.2)]">Scale With Certainty.</h1>
+        <p class="hero-subtitle text-xs sm:text-[13px] text-[#c8b9c2] leading-relaxed font-normal drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)]">Describe your traffic scenario in plain English. Perfexa synthesizes validated k6 load suites, streams real-time latency waveforms, and isolates concurrency bottlenecks with grounded AI analysis.</p>
+      </div>
+
+      <!-- Top-Right: Discreet, Compact 3-Step Process Flow (Small & Ignorable) -->
+      <div class="pipeline-grid shrink-0 flex flex-col gap-1.5 p-2 rounded-xl bg-[#120f16]/50 border border-[#f7a8a0]/15 backdrop-blur-md opacity-60 hover:opacity-100 transition-opacity duration-300 w-full sm:w-80 lg:w-72 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+        <div class="pipeline-card p-2 rounded-lg bg-[#17121b]/60 border border-[#f7a8a0]/10 flex items-start gap-2">

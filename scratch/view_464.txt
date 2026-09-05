@@ -1,0 +1,109 @@
+Created At: 2026-09-06T01:48:46+05:30
+Completed At: 2026-09-06T01:48:46+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 858
+Total Bytes: 53254
+Showing lines 250 to 350
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+250:       floatingObjects.push(crystal);
+251:     }
+252: 
+253:     // Luminous Rose Gold & Sandalwood Constellation Particles
+254:     const particleCount = 280;
+255:     const pGeo = new THREE.BufferGeometry();
+256:     const pPos = new Float32Array(particleCount * 3);
+257:     const pVel = [];
+258: 
+259:     for (let i = 0; i < particleCount; i++) {
+260:       pPos[i * 3] = (Math.random() - 0.5) * 200;
+261:       pPos[i * 3 + 1] = (Math.random() - 0.5) * 120;
+262:       pPos[i * 3 + 2] = -45 + (Math.random() - 0.5) * 70;
+263:       pVel.push({
+264:         x: (Math.random() - 0.5) * 0.035,
+265:         y: (Math.random() - 0.5) * 0.035,
+266:         z: (Math.random() - 0.5) * 0.015
+267:       });
+268:     }
+269:     pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+270: 
+271:     const pMat = new THREE.PointsMaterial({
+272:       color: 0xee9ca7,
+273:       size: 1.8,
+274:       transparent: true,
+275:       opacity: 0.75,
+276:       blending: THREE.AdditiveBlending
+277:     });
+278:     const particles = new THREE.Points(pGeo, pMat);
+279:     rootGroup.add(particles);
+280: 
+281:     // Horizon Floor Grid in Pale Sandalwood & Muted Rose
+282:     const grid = new THREE.GridHelper(260, 44, 0xd4af37, 0x221118);
+283:     grid.position.y = -48;
+284:     grid.material.transparent = true;
+285:     grid.material.opacity = 0.25;
+286:     scene.add(grid);
+287: 
+288:     // High-Sensitivity Responsive Cursor Coordinates
+289:     let mouseX = 0, mouseY = 0;
+290:     let targetMouseX = 0, targetMouseY = 0;
+291: 
+292:     const onPointerMove = (e) => {
+293:       const cx = window.innerWidth / 2;
+294:       const cy = window.innerHeight / 2;
+295:       targetMouseX = ((e.clientX || (e.touches && e.touches[0].clientX) || cx) - cx) / cx;
+296:       targetMouseY = ((e.clientY || (e.touches && e.touches[0].clientY) || cy) - cy) / cy;
+297:     };
+298: 
+299:     window.addEventListener('mousemove', onPointerMove, { passive: true });
+300:     window.addEventListener('touchmove', onPointerMove, { passive: true });
+301: 
+302:     const onResize = () => {
+303:       const w = container.clientWidth || window.innerWidth;
+304:       const h = container.clientHeight || window.innerHeight;
+305:       camera.aspect = w / h;
+306:       camera.updateProjectionMatrix();
+307:       renderer.setSize(w, h);
+308:     };
+309:     window.addEventListener('resize', onResize);
+310: 
+311:     let clock = new THREE.Clock();
+312:     let frameId;
+313: 
+314:     const animate = () => {
+315:       frameId = requestAnimationFrame(animate);
+316:       const delta = Math.min(clock.getDelta(), 0.035);
+317:       const time = clock.getElapsedTime();
+318: 
+319:       // Silky Smooth Exponential Lerp for Mouse Tracking
+320:       const mouseDamping = 1.0 - Math.exp(-6.0 * delta);
+321:       mouseX += (targetMouseX - mouseX) * mouseDamping;
+322:       mouseY += (targetMouseY - mouseY) * mouseDamping;
+323: 
+324:       // 1. Enhanced Scene Rotation with Wide Responsive Range
+325:       const targetRotY = mouseX * 0.50; // up to ~28 degrees yaw
+326:       const targetRotX = -mouseY * 0.35; // up to ~20 degrees pitch
+327:       const targetRotZ = mouseX * -0.09; // dynamic roll
+328: 
+329:       rootGroup.rotation.y += (targetRotY - rootGroup.rotation.y) * (5.5 * delta);
+330:       rootGroup.rotation.x += (targetRotX - rootGroup.rotation.x) * (5.5 * delta);
+331:       rootGroup.rotation.z += (targetRotZ - rootGroup.rotation.z) * (5.5 * delta);
+332: 
+333:       // 2. Camera Dynamic Parallax Flight
+334:       const camTargetX = mouseX * 42;
+335:       const camTargetY = 10 + (-mouseY * 26);
+336:       const camTargetZ = 115 + (Math.abs(mouseX) + Math.abs(mouseY)) * 10;
+337: 
+338:       camera.position.x += (camTargetX - camera.position.x) * (4.5 * delta);
+339:       camera.position.y += (camTargetY - camera.position.y) * (4.5 * delta);
+340:       camera.position.z += (camTargetZ - camera.position.z) * (4.5 * delta);
+341:       camera.lookAt(0, 0, 0);
+342: 
+343:       // 3. Dynamic Cursor Spotlight (Follows mouse in 3D world space)
+344:       cursorLight.position.x += (mouseX * 85 - cursorLight.position.x) * (7.0 * delta);
+345:       cursorLight.position.y += (-mouseY * 60 - cursorLight.position.y) * (7.0 * delta);
+346:       cursorLight.position.z = 45 + Math.sin(time * 2.0) * 8;
+347: 
+348:       // 4. Floating Nodes with Proximity Drift Reaction
+349:       floatingObjects.forEach(obj => {
+350:         if (obj.userData.rotSpeedX) {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

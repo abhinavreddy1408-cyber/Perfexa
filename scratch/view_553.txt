@@ -1,0 +1,213 @@
+Created At: 2026-09-06T02:08:58+05:30
+Completed At: 2026-09-06T02:08:58+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 760
+Total Bytes: 48607
+Showing lines 98 to 302
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+98:     const rootGroup = new THREE.Group();
+99:     scene.add(rootGroup);
+100: 
+101:     // Warm Ambient and Directional Luxury Lighting
+102:     const ambientLight = new THREE.AmbientLight(0x1a1219, 2.2);
+103:     scene.add(ambientLight);
+104: 
+105:     const roseGoldLight = new THREE.DirectionalLight(0xe8998d, 3.2);
+106:     roseGoldLight.position.set(80, 90, 70);
+107:     scene.add(roseGoldLight);
+108: 
+109:     const sandalwoodLight = new THREE.DirectionalLight(0xd4af37, 1.8);
+110:     sandalwoodLight.position.set(-85, -45, -30);
+111:     scene.add(sandalwoodLight);
+112: 
+113:     const rimLight = new THREE.PointLight(0xf7c5cc, 2.0, 300);
+114:     rimLight.position.set(0, 25, 45);
+115:     scene.add(rimLight);
+116: 
+117:     // Premium Materials
+118:     const matRoseGoldChrome = new THREE.MeshPhysicalMaterial({
+119:       color: 0x24151b,
+120:       emissive: 0x3d1b24,
+121:       metalness: 0.92,
+122:       roughness: 0.16,
+123:       clearcoat: 1.0,
+124:       clearcoatRoughness: 0.08
+125:     });
+126: 
+127:     const matRoseWire = new THREE.MeshBasicMaterial({
+128:       color: 0xee9ca7,
+129:       wireframe: true,
+130:       transparent: true,
+131:       opacity: 0.28
+132:     });
+133: 
+134:     const matSandalwoodCore = new THREE.MeshBasicMaterial({
+135:       color: 0xe5c396
+136:     });
+137: 
+138:     const matRoseGlow = new THREE.MeshBasicMaterial({
+139:       color: 0xf4a6a0
+140:     });
+141: 
+142:     // Minimalist Luxury Celestial Node Builder
+143:     function createCelestialNode(size, hasRing, isRose) {
+144:       const group = new THREE.Group();
+145: 
+146:       // Outer smooth geodesic wireframe globe
+147:       const cageGeo = new THREE.IcosahedronGeometry(size, 2);
+148:       const cageMesh = new THREE.Mesh(cageGeo, matRoseWire);
+149:       group.add(cageMesh);
+150:       group._cage = cageMesh;
+151: 
+152:       // Inner faceted core
+153:       const coreGeo = new THREE.OctahedronGeometry(size * 0.55, 1);
+154:       const coreMesh = new THREE.Mesh(coreGeo, matRoseGoldChrome);
+155:       group.add(coreMesh);
+156:       group._core = coreMesh;
+157: 
+158:       // Inner luminous center
+159:       const sparkGeo = new THREE.SphereGeometry(size * 0.18, 16, 16);
+160:       const sparkMesh = new THREE.Mesh(sparkGeo, isRose ? matRoseGlow : matSandalwoodCore);
+161:       group.add(sparkMesh);
+162: 
+163:       if (hasRing) {
+164:         const ringGeo = new THREE.TorusGeometry(size * 1.35, size * 0.03, 16, 64);
+165:         const ringMat = new THREE.MeshBasicMaterial({
+166:           color: isRose ? 0xf4a6a0 : 0xe5c396,
+167:           transparent: true,
+168:           opacity: 0.4
+169:         });
+170:         const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+171:         ringMesh.rotation.x = Math.PI / 3.4;
+172:         group.add(ringMesh);
+173:         group._ring = ringMesh;
+174:       }
+175: 
+176:       return group;
+177:     }
+178: 
+179:     const floatingNodes = [];
+180: 
+181:     // MINIMAL: Exactly 3 nodes total!
+182:     // 1 Grand Central Globe in the background + 2 subtle peripheral satellites
+183:     const celestialConfigs = [
+184:       // 1. Grand Center Globe (majestic, slow, serene in the upper-mid background behind the hero)
+185:       { x: 0, y: 14, z: -55, size: 24, ring: true, isRose: true, rotY: 0.0022, rotX: 0.001, ringRot: 0.003, floatSpeed: 0.4 },
+186:       // 2. Far Left Satellite (discreet, far out of content view)
+187:       { x: -78, y: 18, z: -35, size: 7.5, ring: true, isRose: false, rotY: -0.0035, rotX: 0.0015, ringRot: -0.004, floatSpeed: 0.55 },
+188:       // 3. Far Right Satellite (discreet, far out of content view)
+189:       { x: 78, y: 14, z: -35, size: 7.0, ring: true, isRose: true, rotY: 0.003, rotX: -0.0015, ringRot: 0.004, floatSpeed: 0.5 }
+190:     ];
+191: 
+192:     celestialConfigs.forEach(cfg => {
+193:       const node = createCelestialNode(cfg.size, cfg.ring, cfg.isRose);
+194:       node.position.set(cfg.x, cfg.y, cfg.z);
+195:       node.userData = {
+196:         baseY: cfg.y,
+197:         rotY: cfg.rotY,
+198:         rotX: cfg.rotX,
+199:         ringRot: cfg.ringRot,
+200:         floatSpeed: cfg.floatSpeed,
+201:         floatOffset: Math.random() * Math.PI * 2
+202:       };
+203:       rootGroup.add(node);
+204:       floatingNodes.push(node);
+205:     });
+206: 
+207:     // Minimal Subtle Ambient Dust (only 40 gentle micro-motes)
+208:     const particleCount = 40;
+209:     const pGeo = new THREE.BufferGeometry();
+210:     const pPos = new Float32Array(particleCount * 3);
+211:     const pVel = [];
+212: 
+213:     for (let i = 0; i < particleCount; i++) {
+214:       pPos[i * 3] = (Math.random() - 0.5) * 200;
+215:       pPos[i * 3 + 1] = (Math.random() - 0.5) * 120;
+216:       pPos[i * 3 + 2] = -40 + (Math.random() - 0.5) * 60;
+217:       pVel.push({
+218:         x: (Math.random() - 0.5) * 0.015,
+219:         y: (Math.random() - 0.5) * 0.015,
+220:         z: (Math.random() - 0.5) * 0.008
+221:       });
+222:     }
+223:     pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+224: 
+225:     const pMat = new THREE.PointsMaterial({
+226:       color: 0xee9ca7,
+227:       size: 1.4,
+228:       transparent: true,
+229:       opacity: 0.4,
+230:       blending: THREE.AdditiveBlending
+231:     });
+232:     const particles = new THREE.Points(pGeo, pMat);
+233:     rootGroup.add(particles);
+234: 
+235:     // Subtle Horizon Floor Grid
+236:     const grid = new THREE.GridHelper(260, 36, 0xd4af37, 0x221118);
+237:     grid.position.y = -50;
+238:     grid.material.transparent = true;
+239:     grid.material.opacity = 0.15;
+240:     scene.add(grid);
+241: 
+242:     const onResize = () => {
+243:       const w = container.clientWidth || window.innerWidth;
+244:       const h = container.clientHeight || window.innerHeight;
+245:       camera.aspect = w / h;
+246:       camera.updateProjectionMatrix();
+247:       renderer.setSize(w, h);
+248:     };
+249:     window.addEventListener('resize', onResize);
+250: 
+251:     // Autonomous, Self-Rotating Smooth Animation Loop
+252:     // Zero mouse / cursor influence - calm, steady, hypnotic rotation
+253:     let clock = new THREE.Clock();
+254: 
+255:     const animate = () => {
+256:       requestAnimationFrame(animate);
+257:       const time = clock.getElapsedTime();
+258: 
+259:       // Autonomous self-rotation on each celestial object
+260:       floatingNodes.forEach(node => {
+261:         // Outer wireframe cage self-rotates
+262:         if (node._cage) {
+263:           node._cage.rotation.y += node.userData.rotY;
+264:           node._cage.rotation.x += node.userData.rotX;
+265:         }
+266:         // Inner core counter-rotates slowly
+267:         if (node._core) {
+268:           node._core.rotation.y -= node.userData.rotY * 0.8;
+269:           node._core.rotation.z += node.userData.rotX * 0.6;
+270:         }
+271:         // Orbital ring self-rotates gracefully
+272:         if (node._ring) {
+273:           node._ring.rotation.z += node.userData.ringRot;
+274:         }
+275:         // Smooth serene vertical floating
+276:         node.position.y = node.userData.baseY + Math.sin(time * node.userData.floatSpeed + node.userData.floatOffset) * 2.0;
+277:       });
+278: 
+279:       // Subtle slow particle drift
+280:       const positions = pGeo.attributes.position.array;
+281:       for (let i = 0; i < particleCount; i++) {
+282:         positions[i * 3] += pVel[i].x;
+283:         positions[i * 3 + 1] += pVel[i].y;
+284:         positions[i * 3 + 2] += pVel[i].z;
+285: 
+286:         if (positions[i * 3] > 100) positions[i * 3] = -100;
+287:         if (positions[i * 3] < -100) positions[i * 3] = 100;
+288:         if (positions[i * 3 + 1] > 60) positions[i * 3 + 1] = -60;
+289:         if (positions[i * 3 + 1] < -60) positions[i * 3 + 1] = 60;
+290:       }
+291:       pGeo.attributes.position.needsUpdate = true;
+292: 
+293:       // Horizon floor grid steady drift
+294:       grid.position.z = (time * 2.0) % 6 - 50;
+295: 
+296:       renderer.render(scene, camera);
+297:     };
+298:     animate();
+299:   })();
+300:   </script>
+301: 
+302:   <!-- Ambient Luxury Glows (Rose Gold & Warm Amber) -->
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

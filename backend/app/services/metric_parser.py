@@ -153,7 +153,14 @@ class LiveMetricAggregator:
             if p95 > p95_limit:
                 passed = False
                 threshold_failures.append(f"p95 latency ({p95}ms) exceeded limit ({p95_limit}ms)")
-            if err_rate >= err_limit:
+
+            # Error rate threshold check:
+            # 1. Exact-equal-to-zero safeguard: if 0 requests failed (failed_requests == 0 or err_rate == 0.0),
+            #    the error rate check MUST pass, even if max_error_rate is 0.0.
+            # 2. Otherwise, fail if actual error rate strictly exceeds the allowable limit (err_rate > err_limit).
+            if self.failed_requests == 0 or err_rate == 0.0:
+                pass  # 0 errors always passes any error rate threshold
+            elif err_rate > err_limit:
                 passed = False
                 threshold_failures.append(f"Error rate ({err_rate*100:.1f}%) exceeded limit ({err_limit*100:.1f}%)")
 

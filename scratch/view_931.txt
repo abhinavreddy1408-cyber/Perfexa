@@ -1,0 +1,109 @@
+Created At: 2026-09-06T02:35:50+05:30
+Completed At: 2026-09-06T02:35:50+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 793
+Total Bytes: 51112
+Showing lines 450 to 550
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+450:         <div class="p-3.5 rounded-lg bg-[#17121b]/80 border border-[#f7a8a0]/15 flex flex-col justify-between">
+451:           <div>
+452:             <div class="flex items-center justify-between mb-2">
+453:               <span class="text-[11px] font-mono uppercase text-[#a595a0]">Load Engine Runner</span>
+454:               <span class="flex items-center gap-1 text-[10px] font-medium text-emerald-400">
+455:                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span> READY
+456:               </span>
+457:             </div>
+458:             <div class="font-mono text-sm font-bold text-[#faeade] mb-1">k6 Standalone v0.57.0</div>
+459:             <p class="text-[11px] text-[#8a7587] leading-snug">Native Go-based high-concurrency runner with automated syntax validation, smoke runs, and sub-second telemetry streaming.</p>
+460:           </div>
+461:         </div>
+462: 
+463:         <div class="p-3.5 rounded-lg bg-[#17121b]/80 border border-[#f7a8a0]/15 flex flex-col justify-between">
+464:           <div>
+465:             <div class="flex items-center justify-between mb-2">
+466:               <span class="text-[11px] font-mono uppercase text-[#a595a0]">Diagnostics Engine</span>
+467:               <span class="flex items-center gap-1 text-[10px] font-medium text-emerald-400">
+468:                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span> ACTIVE
+469:               </span>
+470:             </div>
+471:             <div class="font-mono text-sm font-bold text-[#faeade] mb-1">Meta Llama 3.2 11B (NIM)</div>
+472:             <p class="text-[11px] text-[#8a7587] leading-snug">Autonomous root-cause analysis citing actual error distributions, tail latencies, and system bottlenecks without hallucinations.</p>
+473:           </div>
+474:         </div>
+475: 
+476:         <div class="p-3.5 rounded-lg bg-[#17121b]/80 border border-[#f7a8a0]/15 flex flex-col justify-between">
+477:           <div>
+478:             <div class="flex items-center justify-between mb-2">
+479:               <span class="text-[11px] font-mono uppercase text-[#a595a0]">Execution Database</span>
+480:               <span class="flex items-center gap-1 text-[10px] font-medium text-emerald-400">
+481:                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span> PERSISTED
+482:               </span>
+483:             </div>
+484:             <div class="font-mono text-sm font-bold text-[#ffd1cc] mb-1"><strong id="telemetry-runs-count">40+ Benchmarks Saved</strong></div>
+485:             <p class="text-[11px] text-[#8a7587] leading-snug">Thread-safe SQLite store maintaining complete run records, historical telemetry time-series, and generated scripts.</p>
+486:           </div>
+487:         </div>
+488:       </div>
+489: 
+490:       <!-- Core Engine Capabilities -->
+491:       <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 border-t border-[#f7a8a0]/10 text-xs">
+492:         <div class="p-3 rounded-lg bg-[#140e18]/60 border border-[#e8d5b5]/15">
+493:           <div class="font-display font-semibold text-white mb-1 flex items-center gap-1.5">
+494:             <span class="w-1.5 h-1.5 rounded-full bg-[#f7a8a0]"></span>
+495:             Autonomous Scripting
+496:           </div>
+497:           <p class="text-[#a595a0] text-[11px] leading-relaxed">Converts human prompts like "stress test my heavy endpoint with 200 users" into fully structured, validated k6 JavaScript test suites with automated ramp-up stages.</p>
+498:         </div>
+499:         <div class="p-3 rounded-lg bg-[#140e18]/60 border border-[#e8d5b5]/15">
+500:           <div class="font-display font-semibold text-white mb-1 flex items-center gap-1.5">
+501:             <span class="w-1.5 h-1.5 rounded-full bg-[#f7a8a0]"></span>
+502:             Real-Time Waveforms
+503:           </div>
+504:           <p class="text-[#a595a0] text-[11px] leading-relaxed">Live WebSocket pipeline streams real-time concurrency, latency percentiles (p50, p95), requests/sec, and HTTP error curves directly to interactive canvas charts.</p>
+505:         </div>
+506:         <div class="p-3 rounded-lg bg-[#140e18]/60 border border-[#e8d5b5]/15">
+507:           <div class="font-display font-semibold text-white mb-1 flex items-center gap-1.5">
+508:             <span class="w-1.5 h-1.5 rounded-full bg-[#f7a8a0]"></span>
+509:             Codebase Corrector
+510:           </div>
+511:           <p class="text-[#a595a0] text-[11px] leading-relaxed">Static linter orchestration (Flake8 &amp; ESLint) combined with LLM senior code reviews to diagnose code smells, security oversights, and performance anti-patterns.</p>
+512:         </div>
+513:       </div>
+514:     </section>
+515: 
+516:     <!-- Section: Codebase Corrector -->
+517:     <section id="corrector-section" class="card corrector-section hidden rounded-xl bg-[#120f16]/75 backdrop-blur-xl border border-[#f7a8a0]/15 p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+518:       <div class="section-header mb-4">
+519:         <div class="badge-row flex items-center gap-2 mb-2">
+520:           <span id="corrector-lang-badge" class="px-2 py-0.5 rounded bg-[#1f1721] border border-[#f7a8a0]/30 font-mono text-[10px] font-semibold text-[#ffd1cc]">PYTHON / JAVASCRIPT</span>
+521:           <span class="px-2 py-0.5 rounded bg-[#2a1721] border border-[#e0838a]/30 font-mono text-[10px] font-semibold text-[#f7a8a0]">FLAKE8 / ESLINT + AI QUALITY REVIEW</span>
+522:         </div>
+523:         <h2 class="font-display text-lg sm:text-xl font-bold tracking-tight mb-1 bg-gradient-to-r from-[#ffd1cc] via-[#f7a8a0] to-[#e0838a] bg-clip-text text-transparent">Codebase Corrector</h2>
+524:         <p class="section-desc text-xs text-[#baaab4] leading-normal max-w-4xl">Upload a single Python (<code>.py</code>) or JavaScript (<code>.js</code>) source file. Perfexa executes native static analysis and synthesizes a grounded senior engineer quality review.</p>
+525:       </div>
+526: 
+527:       <!-- Upload Dropzone Area -->
+528:       <div class="upload-container space-y-4">
+529:         <div class="upload-dropzone border-2 border-dashed border-[#e8d5b5]/30 hover:border-[#f7a8a0] bg-[#0a070e]/60 rounded-xl p-8 text-center cursor-pointer transition-all" id="upload-dropzone" tabindex="0" role="button" aria-label="Drop source code file or click to browse">
+530:           <input type="file" id="code-file-input" accept=".py,.js" class="file-input-hidden hidden" aria-label="Upload Python or JavaScript file" />
+531:           <div class="dropzone-content flex flex-col items-center justify-center gap-2">
+532:             <div class="upload-icon text-[#f7a8a0] mb-1">
+533:               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+534:             </div>
+535:             <p class="upload-title text-sm text-[#faeade] font-medium">Drag &amp; drop your source file here, or <span class="upload-browse text-[#f7a8a0] underline font-semibold">browse files</span></p>
+536:             <p class="upload-hint text-xs text-[#8a7587]">Strictly supports single <code>.py</code> or <code>.js</code> files up to 2MB</p>
+537:             <div id="selected-file-info" class="selected-file-info hidden mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1a121c] border border-[#f7a8a0]/40 text-xs">
+538:               <span class="file-icon text-[#f7a8a0]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+539:               <span id="selected-file-name" class="file-name font-mono text-[#faeade]">sample.py</span>
+540:               <span id="selected-file-size" class="file-size text-[#a595a0]">(1.2 KB)</span>
+541:               <button type="button" id="btn-remove-file" class="btn-remove-file text-[#f7a8a0] hover:text-white font-bold ml-1" title="Remove selected file">&times;</button>
+542:             </div>
+543:           </div>
+544:         </div>
+545:         <div class="upload-actions flex justify-end">
+546:           <button type="button" id="btn-analyze-code" class="btn btn-primary px-6 py-2.5 rounded-lg border border-[#f3e3cc] text-[#120e14] bg-gradient-to-r from-[#faeade] via-[#f3e3cc] to-[#ebd2ba] font-semibold text-xs hover:brightness-105 active:scale-[0.99] transition-all shadow-[0_0_20px_rgba(243,227,204,0.3)] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2" disabled>
+547:             <span class="btn-text">Run Static Analysis &amp; AI Review</span>
+548:             <span class="spinner hidden w-3.5 h-3.5 border-2 border-[#120e14] border-t-transparent rounded-full animate-spin" id="corrector-spinner"></span>
+549:           </button>
+550:         </div>
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

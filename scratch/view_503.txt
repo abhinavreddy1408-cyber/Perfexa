@@ -1,0 +1,229 @@
+Created At: 2026-09-06T01:51:18+05:30
+Completed At: 2026-09-06T01:51:19+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 760
+Total Bytes: 48607
+Showing lines 380 to 600
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+380:           <span class="pipeline-num px-1.5 py-0.5 rounded bg-[#1f1721] border border-[#f7a8a0]/25 font-mono text-[9px] font-semibold text-[#ffd1cc] shrink-0">03</span>
+381:           <div class="pipeline-body">
+382:             <h4 class="font-display font-semibold text-[11px] text-white leading-snug">Grounded Diagnostics</h4>
+383:             <p class="text-[10px] text-[#8a7587] leading-snug">Root-cause analysis citing verified target limits without false infrastructure claims.</p>
+384:           </div>
+385:         </div>
+386:       </div>
+387:     </div>
+388: 
+389:     <!-- Section: About & Platform Telemetry -->
+390:     <section id="about-section" class="card about-section hidden scroll-mt-24 rounded-xl bg-[#120f16]/90 backdrop-blur-xl border border-[#f7a8a0]/25 p-5 sm:p-7 shadow-[0_12px_40px_rgba(0,0,0,0.6)] transition-all">
+391:       <div class="flex items-start justify-between gap-4 pb-4 mb-5 border-b border-[#f7a8a0]/15">
+392:         <div>
+393:           <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1b141d]/80 border border-[#f7a8a0]/30 font-mono text-[10px] font-semibold text-[#ffd1cc] uppercase tracking-wider mb-2">
+394:             System Architecture &amp; Runtime Telemetry
+395:           </div>
+396:           <h2 class="font-display text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-[#ffd1cc] via-[#f7a8a0] to-[#e0838a] bg-clip-text text-transparent">About Perfexa</h2>
+397:           <p class="text-xs text-[#baaab4] mt-1 max-w-2xl leading-relaxed">Perfexa is an autonomous load testing and intelligent diagnostics engine designed to evaluate high-throughput web applications with zero manual script-writing. It synthesizes k6 load suites from natural language prompts, streams real-time latency waveforms, and isolates concurrency bottlenecks.</p>
+398:         </div>
+399:         <button type="button" id="btn-close-about" class="px-3.5 py-1.5 rounded-md bg-[#1f1721] border border-[#e8d5b5]/30 hover:border-[#f7a8a0] hover:bg-[#2c1d29] text-xs font-medium text-[#ded2dc] hover:text-white transition-all shrink-0 cursor-pointer">Close &times;</button>
+400:       </div>
+401: 
+402:       <!-- Runtime Specifications Grid -->
+403:       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
+404:         <div class="p-3.5 rounded-lg bg-[#17121b]/80 border border-[#f7a8a0]/15 flex flex-col justify-between">
+405:           <div>
+406:             <div class="flex items-center justify-between mb-2">
+407:               <span class="text-[11px] font-mono uppercase text-[#a595a0]">Target Application</span>
+408:               <span class="flex items-center gap-1 text-[10px] font-medium text-emerald-400">
+409:                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span> LIVE
+410:               </span>
+411:             </div>
+412:             <div class="font-mono text-sm font-bold text-[#faeade] mb-1">127.0.0.1:8001 (FastAPI)</div>
+413:             <p class="text-[11px] text-[#8a7587] leading-snug">Dedicated local target service providing mock endpoints, database query simulation, and heavy CPU load targets.</p>
+414:           </div>
+415:         </div>
+416: 
+417:         <div class="p-3.5 rounded-lg bg-[#17121b]/80 border border-[#f7a8a0]/15 flex flex-col justify-between">
+418:           <div>
+419:             <div class="flex items-center justify-between mb-2">
+420:               <span class="text-[11px] font-mono uppercase text-[#a595a0]">Load Engine Runner</span>
+421:               <span class="flex items-center gap-1 text-[10px] font-medium text-emerald-400">
+422:                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span> READY
+423:               </span>
+424:             </div>
+425:             <div class="font-mono text-sm font-bold text-[#faeade] mb-1">k6 Standalone v0.57.0</div>
+426:             <p class="text-[11px] text-[#8a7587] leading-snug">Native Go-based high-concurrency runner with automated syntax validation, smoke runs, and sub-second telemetry streaming.</p>
+427:           </div>
+428:         </div>
+429: 
+430:         <div class="p-3.5 rounded-lg bg-[#17121b]/80 border border-[#f7a8a0]/15 flex flex-col justify-between">
+431:           <div>
+432:             <div class="flex items-center justify-between mb-2">
+433:               <span class="text-[11px] font-mono uppercase text-[#a595a0]">Diagnostics Engine</span>
+434:               <span class="flex items-center gap-1 text-[10px] font-medium text-emerald-400">
+435:                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span> ACTIVE
+436:               </span>
+437:             </div>
+438:             <div class="font-mono text-sm font-bold text-[#faeade] mb-1">Meta Llama 3.2 11B (NIM)</div>
+439:             <p class="text-[11px] text-[#8a7587] leading-snug">Autonomous root-cause analysis citing actual error distributions, tail latencies, and system bottlenecks without hallucinations.</p>
+440:           </div>
+441:         </div>
+442: 
+443:         <div class="p-3.5 rounded-lg bg-[#17121b]/80 border border-[#f7a8a0]/15 flex flex-col justify-between">
+444:           <div>
+445:             <div class="flex items-center justify-between mb-2">
+446:               <span class="text-[11px] font-mono uppercase text-[#a595a0]">Execution Database</span>
+447:               <span class="flex items-center gap-1 text-[10px] font-medium text-emerald-400">
+448:                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span> PERSISTED
+449:               </span>
+450:             </div>
+451:             <div class="font-mono text-sm font-bold text-[#ffd1cc] mb-1"><strong id="telemetry-runs-count">40+ Benchmarks Saved</strong></div>
+452:             <p class="text-[11px] text-[#8a7587] leading-snug">Thread-safe SQLite store maintaining complete run records, historical telemetry time-series, and generated scripts.</p>
+453:           </div>
+454:         </div>
+455:       </div>
+456: 
+457:       <!-- Core Engine Capabilities -->
+458:       <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 border-t border-[#f7a8a0]/10 text-xs">
+459:         <div class="p-3 rounded-lg bg-[#140e18]/60 border border-[#e8d5b5]/15">
+460:           <div class="font-display font-semibold text-white mb-1 flex items-center gap-1.5">
+461:             <span class="w-1.5 h-1.5 rounded-full bg-[#f7a8a0]"></span>
+462:             Autonomous Scripting
+463:           </div>
+464:           <p class="text-[#a595a0] text-[11px] leading-relaxed">Converts human prompts like "stress test my heavy endpoint with 200 users" into fully structured, validated k6 JavaScript test suites with automated ramp-up stages.</p>
+465:         </div>
+466:         <div class="p-3 rounded-lg bg-[#140e18]/60 border border-[#e8d5b5]/15">
+467:           <div class="font-display font-semibold text-white mb-1 flex items-center gap-1.5">
+468:             <span class="w-1.5 h-1.5 rounded-full bg-[#f7a8a0]"></span>
+469:             Real-Time Waveforms
+470:           </div>
+471:           <p class="text-[#a595a0] text-[11px] leading-relaxed">Live WebSocket pipeline streams real-time concurrency, latency percentiles (p50, p95), requests/sec, and HTTP error curves directly to interactive canvas charts.</p>
+472:         </div>
+473:         <div class="p-3 rounded-lg bg-[#140e18]/60 border border-[#e8d5b5]/15">
+474:           <div class="font-display font-semibold text-white mb-1 flex items-center gap-1.5">
+475:             <span class="w-1.5 h-1.5 rounded-full bg-[#f7a8a0]"></span>
+476:             Codebase Corrector
+477:           </div>
+478:           <p class="text-[#a595a0] text-[11px] leading-relaxed">Static linter orchestration (Flake8 &amp; ESLint) combined with LLM senior code reviews to diagnose code smells, security oversights, and performance anti-patterns.</p>
+479:         </div>
+480:       </div>
+481:     </section>
+482: 
+483:     <!-- Section: Codebase Corrector -->
+484:     <section id="corrector-section" class="card corrector-section hidden rounded-xl bg-[#120f16]/75 backdrop-blur-xl border border-[#f7a8a0]/15 p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+485:       <div class="section-header mb-4">
+486:         <div class="badge-row flex items-center gap-2 mb-2">
+487:           <span id="corrector-lang-badge" class="px-2 py-0.5 rounded bg-[#1f1721] border border-[#f7a8a0]/30 font-mono text-[10px] font-semibold text-[#ffd1cc]">PYTHON / JAVASCRIPT</span>
+488:           <span class="px-2 py-0.5 rounded bg-[#2a1721] border border-[#e0838a]/30 font-mono text-[10px] font-semibold text-[#f7a8a0]">FLAKE8 / ESLINT + AI QUALITY REVIEW</span>
+489:         </div>
+490:         <h2 class="font-display text-lg sm:text-xl font-bold tracking-tight mb-1 bg-gradient-to-r from-[#ffd1cc] via-[#f7a8a0] to-[#e0838a] bg-clip-text text-transparent">Codebase Corrector</h2>
+491:         <p class="section-desc text-xs text-[#baaab4] leading-normal max-w-4xl">Upload a single Python (<code>.py</code>) or JavaScript (<code>.js</code>) source file. Perfexa executes native static analysis and synthesizes a grounded senior engineer quality review.</p>
+492:       </div>
+493: 
+494:       <!-- Upload Dropzone Area -->
+495:       <div class="upload-container space-y-4">
+496:         <div class="upload-dropzone border-2 border-dashed border-[#e8d5b5]/30 hover:border-[#f7a8a0] bg-[#0a070e]/60 rounded-xl p-8 text-center cursor-pointer transition-all" id="upload-dropzone" tabindex="0" role="button" aria-label="Drop source code file or click to browse">
+497:           <input type="file" id="code-file-input" accept=".py,.js" class="file-input-hidden hidden" aria-label="Upload Python or JavaScript file" />
+498:           <div class="dropzone-content flex flex-col items-center justify-center gap-2">
+499:             <div class="upload-icon text-[#f7a8a0] mb-1">
+500:               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+501:             </div>
+502:             <p class="upload-title text-sm text-[#faeade] font-medium">Drag &amp; drop your source file here, or <span class="upload-browse text-[#f7a8a0] underline font-semibold">browse files</span></p>
+503:             <p class="upload-hint text-xs text-[#8a7587]">Strictly supports single <code>.py</code> or <code>.js</code> files up to 2MB</p>
+504:             <div id="selected-file-info" class="selected-file-info hidden mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1a121c] border border-[#f7a8a0]/40 text-xs">
+505:               <span class="file-icon text-[#f7a8a0]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+506:               <span id="selected-file-name" class="file-name font-mono text-[#faeade]">sample.py</span>
+507:               <span id="selected-file-size" class="file-size text-[#a595a0]">(1.2 KB)</span>
+508:               <button type="button" id="btn-remove-file" class="btn-remove-file text-[#f7a8a0] hover:text-white font-bold ml-1" title="Remove selected file">&times;</button>
+509:             </div>
+510:           </div>
+511:         </div>
+512:         <div class="upload-actions flex justify-end">
+513:           <button type="button" id="btn-analyze-code" class="btn btn-primary px-6 py-2.5 rounded-lg border border-[#f3e3cc] text-[#120e14] bg-gradient-to-r from-[#faeade] via-[#f3e3cc] to-[#ebd2ba] font-semibold text-xs hover:brightness-105 active:scale-[0.99] transition-all shadow-[0_0_20px_rgba(243,227,204,0.3)] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2" disabled>
+514:             <span class="btn-text">Run Static Analysis &amp; AI Review</span>
+515:             <span class="spinner hidden w-3.5 h-3.5 border-2 border-[#120e14] border-t-transparent rounded-full animate-spin" id="corrector-spinner"></span>
+516:           </button>
+517:         </div>
+518:       </div>
+519: 
+520:       <!-- Corrector Results Section -->
+521:       <div id="corrector-results" class="corrector-results hidden mt-6 space-y-5">
+522:         <!-- Scorecards -->
+523:         <div class="scorecard-grid grid grid-cols-2 sm:grid-cols-5 gap-3">
+524:           <div class="stat-card p-3 rounded-lg bg-[#161217]/80 border border-[#e8d5b5]/25">
+525:             <span class="stat-label text-[11px] text-[#a595a0]">Language</span>
+526:             <div class="stat-value font-mono font-bold text-white text-lg mt-0.5" id="corrector-stat-lang">-</div>
+527:             <span class="stat-sub text-[10px] text-[#8a7587]" id="corrector-stat-lines">0 lines</span>
+528:           </div>
+529:           <div class="stat-card p-3 rounded-lg bg-[#161217]/80 border border-[#e8d5b5]/25">
+530:             <span class="stat-label text-[11px] text-[#a595a0]">Total Findings</span>
+531:             <div class="stat-value font-mono font-bold text-[#faeade] text-lg mt-0.5" id="corrector-stat-total">0</div>
+532:             <span class="stat-sub text-[10px] text-[#8a7587]">Issues detected</span>
+533:           </div>
+534:           <div class="stat-card p-3 rounded-lg bg-[#161217]/80 border border-red-500/30">
+535:             <span class="stat-label text-[11px] text-[#a595a0]">Critical Errors</span>
+536:             <div class="stat-value font-mono font-bold text-red-400 text-lg mt-0.5" id="corrector-stat-errors">0</div>
+537:             <span class="stat-sub text-[10px] text-red-400/80">Must fix first</span>
+538:           </div>
+539:           <div class="stat-card p-3 rounded-lg bg-[#161217]/80 border border-amber-500/30">
+540:             <span class="stat-label text-[11px] text-[#a595a0]">Warnings</span>
+541:             <div class="stat-value font-mono font-bold text-amber-400 text-lg mt-0.5" id="corrector-stat-warnings">0</div>
+542:             <span class="stat-sub text-[10px] text-amber-400/80">Style &amp; conventions</span>
+543:           </div>
+544:           <div class="stat-card p-3 rounded-lg bg-[#161217]/80 border border-[#f7a8a0]/30">
+545:             <span class="stat-label text-[11px] text-[#a595a0]">Quality Verdict</span>
+546:             <div class="stat-value font-mono font-bold text-[#ffd1cc] text-sm mt-1" id="corrector-stat-verdict">-</div>
+547:             <span class="stat-sub text-[10px] text-[#8a7587]" id="corrector-stat-status">Cleanliness</span>
+548:           </div>
+549:         </div>
+550: 
+551:         <!-- AI Quality Review Report Card -->
+552:         <div class="ai-report-card p-4 rounded-xl bg-[#17121b]/90 border border-[#f7a8a0]/25 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+553:           <div class="ai-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#2a1724] border border-[#f7a8a0]/40 text-[10px] font-mono font-semibold text-[#ffd1cc] uppercase tracking-wider mb-3">Senior Engineer Quality Summary</div>
+554:           <div id="corrector-ai-summary" class="markdown-body text-xs text-[#e0e2ed] leading-relaxed"></div>
+555:         </div>
+556: 
+557:         <!-- Structured Findings List -->
+558:         <div class="findings-container p-4 rounded-xl bg-[#17121b]/90 border border-[#e8d5b5]/20">
+559:           <div class="findings-header flex items-center justify-between mb-3">
+560:             <h3 class="font-display font-semibold text-sm text-white">Detailed Static Analysis Findings (<span id="findings-count-badge" class="font-mono text-[#f7a8a0]">0</span>)</h3>
+561:             <span class="findings-engine-pill px-2.5 py-0.5 rounded bg-[#1f1721] border border-[#e8d5b5]/30 font-mono text-[10px] text-[#ded2dc]" id="findings-engine-pill">Engine: Flake8</span>
+562:           </div>
+563:           <div class="findings-list space-y-2 text-xs" id="findings-list"></div>
+564:         </div>
+565:       </div>
+566:     </section>
+567: 
+568:     <!-- Section 1: Describe Your Performance Test Card -->
+569:     <section class="card input-section relative w-full rounded-xl bg-[#120f16]/65 backdrop-blur-md border border-[#f7a8a0]/18 p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300" id="loadtest-input-section">
+570:       <div class="section-header mb-4">
+571:         <h2 class="font-display text-lg sm:text-xl font-bold tracking-tight mb-1 bg-gradient-to-r from-[#ffd1cc] via-[#f7a8a0] to-[#e0838a] bg-clip-text text-transparent">1. Describe Your Performance Test</h2>
+572:         <p class="section-desc text-xs text-[#baaab4] leading-normal max-w-4xl">Type your goal in plain English. The AI will extract intent, configure ramp patterns, and generate synthetic payloads.</p>
+573:       </div>
+574: 
+575:       <div class="preset-chips flex flex-wrap items-center gap-2 mb-4 text-xs">
+576:         <span class="preset-label text-[#a595a0] font-medium mr-0.5">Quick Presets:</span>
+577:         <button class="chip px-2.5 py-1 rounded-full bg-[#1b141d]/60 hover:bg-[#261c28] border border-[#e8d5b5]/25 hover:border-[#f7e8d0] hover:shadow-[0_0_12px_rgba(243,227,204,0.2)] text-[#ded2dc] text-[11px] transition-all" data-prompt="stress test my heavy endpoint with 200 users for 20 seconds to find breaking point" type="button">Stress (Breaking Point)</button>
+578:         <button class="chip px-2.5 py-1 rounded-full bg-[#1b141d]/60 hover:bg-[#261c28] border border-[#e8d5b5]/25 hover:border-[#f7e8d0] hover:shadow-[0_0_12px_rgba(243,227,204,0.2)] text-[#ded2dc] text-[11px] transition-all" data-prompt="run a baseline health check on my fast endpoint with 10 users for 15 seconds" type="button">Baseline (10 VUs)</button>
+579:         <button class="chip px-2.5 py-1 rounded-full bg-[#1b141d]/60 hover:bg-[#261c28] border border-[#e8d5b5]/25 hover:border-[#f7e8d0] hover:shadow-[0_0_12px_rgba(243,227,204,0.2)] text-[#ded2dc] text-[11px] transition-all" data-prompt="soak test my delayed endpoint for 30 seconds with 30 steady users" type="button">Soak (30 VUs, Latency)</button>
+580:         <button class="chip px-2.5 py-1 rounded-full bg-[#1b141d]/60 hover:bg-[#261c28] border border-[#e8d5b5]/25 hover:border-[#f7e8d0] hover:shadow-[0_0_12px_rgba(243,227,204,0.2)] text-[#ded2dc] text-[11px] transition-all" id="chip-to-corrector" type="button">Code Corrector (.py / .js)</button>
+581:       </div>
+582: 
+583:       <form id="prompt-form" class="prompt-form relative flex flex-col md:flex-row items-stretch md:items-center gap-3.5 mb-5">
+584:         <div class="input-wrapper relative flex-1">
+585:           <textarea id="prompt-input" class="w-full bg-[#0a070e]/65 hover:bg-[#0a070e]/80 focus:bg-[#0a070e]/95 border border-[#e8d5b5]/25 focus:border-[#f7a8a0] focus:ring-1 focus:ring-[#f7a8a0]/50 rounded-lg p-3 text-[13px] text-[#faeade] placeholder:text-[#8a7587] font-sans resize-none outline-none transition-all shadow-inner" placeholder="e.g. stress test my login and checkout API with 200 users for 20 seconds..." rows="3" aria-label="Performance test description in natural language" required></textarea>
+586:         </div>
+587:         <button type="submit" id="btn-analyze" class="btn btn-primary self-stretch md:self-auto px-5 py-2.5 rounded-lg border border-[#f3e3cc] text-[#120e14] bg-gradient-to-r from-[#faeade] via-[#f3e3cc] to-[#ebd2ba] font-semibold text-xs hover:brightness-105 active:scale-[0.99] transition-all shadow-[0_0_20px_rgba(243,227,204,0.3)] flex items-center justify-center gap-1.5 shrink-0">
+588:           <span class="btn-text">Analyze Intent</span>
+589:           <span class="text-sm font-bold">→</span>
+590:           <span class="spinner hidden w-3.5 h-3.5 border-2 border-[#120e14] border-t-transparent rounded-full animate-spin" id="analyze-spinner"></span>
+591:         </button>
+592:       </form>
+593: 
+594:       <!-- Benchmark Quick-Load Strip -->
+595:       <div class="benchmark-shortcuts flex flex-wrap items-center gap-2.5 pt-1 text-xs" id="benchmark-shortcuts">
+596:         <span class="preset-label text-[#a595a0] font-medium text-[11px]">Recent Benchmarks:</span>
+597:         <div id="recent-runs-pills" class="recent-pills flex flex-wrap items-center gap-2"></div>
+598:       </div>
+599:     </section>
+600: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

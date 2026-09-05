@@ -1,0 +1,69 @@
+Created At: 2026-09-06T01:38:18+05:30
+Completed At: 2026-09-06T01:38:18+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 702
+Total Bytes: 43851
+Showing lines 325 to 385
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+325:       rootGroup.rotation.x = targetY * 0.016;
+326: 
+327:       renderer.render(scene, camera);
+328:     };
+329:     animate();
+330:   })();
+331:   </script>
+332: 
+333:   <!-- Ambient Luxury Glows (Rose Gold & Warm Amber) -->
+334:   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+335:     <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[760px] h-[380px] bg-gradient-to-b from-[#f7a8a0]/15 to-[#e0838a]/5 blur-[140px] rounded-full"></div>
+336:     <div class="absolute top-[380px] -left-32 w-[520px] h-[460px] bg-[#d4af37]/10 blur-[150px] rounded-full"></div>
+337:     <div class="absolute bottom-10 right-0 w-[580px] h-[420px] bg-[#f4a6a0]/12 blur-[140px] rounded-full"></div>
+338:   </div>
+339: 
+340:   <!-- Top Navigation Bar -->
+341:   <header class="navbar sticky top-0 w-full z-50 bg-[#0a0a0f]/85 backdrop-blur-xl border-b border-[#f7a8a0]/15">
+342:     <div class="w-full h-20 px-5 sm:px-8 lg:px-10 flex items-center justify-between">
+343:       <div class="brand flex items-center gap-4">
+344:         <div class="brand-logo w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-black border-1.5 border-[#f3e3cc]/60 overflow-hidden flex items-center justify-center shadow-[0_0_22px_rgba(247,168,160,0.35)] group shrink-0 transition-transform duration-200 hover:scale-105">
+345:           <img src="assets/perfexa-logo.jpg" alt="Perfexa" class="brand-logo-img w-full h-full object-cover rounded-xl">
+346:         </div>
+347:         <div class="flex flex-col justify-center">
+348:           <div class="flex items-center gap-2">
+349:             <span class="brand-title font-display font-extrabold text-2xl sm:text-[28px] tracking-tight bg-gradient-to-r from-[#ffd1cc] via-[#f7a8a0] to-[#e0838a] bg-clip-text text-transparent drop-shadow-sm leading-tight">Perfexa</span>
+350:           </div>
+351:           <span class="brand-subtitle text-xs sm:text-[13px] text-[#c9b8b0] font-normal tracking-tight">Autonomous Load Testing &amp; Diagnostic Engine</span>
+352:         </div>
+353:       </div>
+354:       <div class="nav-actions flex items-center gap-2.5">
+355:         <div class="flex items-center p-0.5 bg-[#161217]/70 border border-[#e8d5b5]/30 rounded-lg shadow-sm backdrop-blur-md">
+356:           <button id="btn-mode-loadtest" class="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-gradient-to-r from-[#faeade] via-[#f3e3cc] to-[#ebd2ba] text-[#120e14] shadow-[0_0_12px_rgba(243,227,204,0.35)] transition-all" type="button"><span>Load Testing</span></button>
+357:           <button id="btn-mode-corrector" class="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium text-[#c4b5bc] hover:text-[#faeade] hover:bg-[#251c23]/60 transition-colors" type="button"><span>Code Corrector</span></button>
+358:         </div>
+359:         <div id="system-status" class="hidden md:flex items-center gap-2 px-2.5 py-1 bg-[#161217]/70 border border-[#e8d5b5]/30 rounded-lg backdrop-blur-md">
+360:           <span class="dot w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]"></span>
+361:           <span class="text-xs font-medium text-[#ded2dc]">Target: Ready (:8001)</span>
+362:         </div>
+363:         <button id="btn-history-toggle" class="flex items-center gap-1.5 px-3 py-1 bg-[#161217]/70 hover:bg-[#201822] border border-[#e8d5b5]/35 hover:border-[#f7e8d0] hover:shadow-[0_0_15px_rgba(243,227,204,0.25)] rounded-lg text-xs text-[#ded2dc] transition-all backdrop-blur-md" type="button" aria-expanded="false" aria-controls="history-section">
+364:           <span class="font-medium">Run History</span>
+365:           <span class="text-[11px] text-[#f7a8a0] font-mono font-medium">( <span id="history-count">0</span> )</span>
+366:         </button>
+367:       </div>
+368:     </div>
+369:   </header>
+370: 
+371:   <!-- Global Alert Banner for Graceful Error Reporting -->
+372:   <div id="alert-banner" class="alert-banner hidden max-w-[1440px] mx-auto px-6 sm:px-10 mt-4" role="alert" aria-live="polite">
+373:     <span class="alert-icon"></span>
+374:     <span id="alert-message" class="alert-message"></span>
+375:     <button id="btn-close-alert" class="alert-close" aria-label="Dismiss alert">&times;</button>
+376:   </div>
+377: 
+378:   <!-- Main Content Layout positioned cleanly above 3D scene -->
+379:   <main class="relative z-10 w-full max-w-[1440px] mx-auto px-6 sm:px-10 pt-10 pb-16 space-y-6">
+380:     <!-- Hero Header & Top-Right Compact Pipeline -->
+381:     <div class="flex flex-col lg:flex-row items-start lg:items-start justify-between gap-6 mb-3">
+382:       <!-- Left: Hero Headline & Description -->
+383:       <div class="hero-section flex flex-col items-start max-w-2xl">
+384:         <div class="hero-badge inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#1b141d]/70 border border-[#f7a8a0]/30 backdrop-blur-md mb-3 shadow-[0_0_15px_rgba(247,168,160,0.12)]">
+385:           <span class="font-mono text-[10px] tracking-wider uppercase font-semibold text-[#ffd1cc]">AUTONOMOUS LOAD TESTING &amp; INTELLIGENT TELEMETRY</span>
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

@@ -1,0 +1,81 @@
+Created At: 2026-09-06T01:38:38+05:30
+Completed At: 2026-09-06T01:38:38+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 702
+Total Bytes: 43851
+Showing lines 630 to 702
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+630:             <canvas id="vusChart"></canvas>
+631:           </div>
+632:         </div>
+633:         <div class="chart-container p-4 rounded-xl bg-[#0a070e]/80 border border-[#e8d5b5]/20 h-64 flex flex-col">
+634:           <h4 class="font-display text-xs font-semibold text-[#ffd1cc] uppercase tracking-wider mb-2">Latency &amp; Errors Over Time</h4>
+635:           <div class="flex-1 relative w-full h-full">
+636:             <canvas id="latencyChart"></canvas>
+637:           </div>
+638:         </div>
+639:       </div>
+640:     </section>
+641: 
+642:     <!-- Section 4: Results & AI Summary View -->
+643:     <section id="results-section" class="card results-section hidden rounded-xl bg-[#120f16]/75 backdrop-blur-xl border border-[#f7a8a0]/15 p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+644:       <div class="results-header flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#f7a8a0]/15">
+645:         <div class="results-title-group">
+646:           <div id="verdict-banner" class="verdict-banner inline-block px-3 py-1 rounded-md font-mono text-xs font-bold uppercase tracking-wider mb-1">ANALYZING...</div>
+647:           <h2 class="font-display text-xl font-bold bg-gradient-to-r from-[#ffd1cc] via-[#f7a8a0] to-[#e0838a] bg-clip-text text-transparent">Autonomous Test Report &amp; Diagnostics</h2>
+648:         </div>
+649:         <button id="btn-view-script" class="btn btn-outline px-4 py-2 rounded-lg border border-[#e8d5b5]/35 hover:border-[#f7e8d0] text-xs text-[#ded2dc] hover:text-white transition-all backdrop-blur-md" aria-expanded="false" aria-controls="script-drawer">View Generated k6 Script</button>
+650:       </div>
+651: 
+652:       <!-- Generated Script Drawer -->
+653:       <div id="script-drawer" class="script-drawer hidden mb-5 p-4 rounded-xl bg-[#0a070e]/95 border border-[#f7a8a0]/25">
+654:         <div class="script-drawer-header flex items-center justify-between mb-2">
+655:           <h4 class="font-display text-xs font-semibold text-[#ffd1cc] uppercase tracking-wide">Synthesized k6 JavaScript Load-Test Script</h4>
+656:           <button id="btn-close-script" class="btn btn-sm btn-outline text-xs px-2 py-0.5 rounded border border-[#e8d5b5]/30 text-[#ded2dc]">Close</button>
+657:         </div>
+658:         <pre id="script-code-block" class="code-preview p-3 rounded-lg bg-black/70 font-mono text-xs text-[#faeade] overflow-x-auto max-h-72"></pre>
+659:       </div>
+660: 
+661:       <!-- Key Metrics Scorecards -->
+662:       <div class="scorecard-grid grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5" id="scorecard-grid"></div>
+663: 
+664:       <!-- AI Diagnostic Report Rendered Markdown -->
+665:       <div class="ai-report-card p-5 rounded-xl bg-[#17121b]/90 border border-[#f7a8a0]/25 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+666:         <div class="ai-badge inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#2a1724] border border-[#f7a8a0]/40 text-[10px] font-mono font-semibold text-[#ffd1cc] uppercase tracking-wider mb-4">AI Performance Diagnostic Report</div>
+667:         <div id="ai-report-body" class="markdown-body text-xs text-[#e0e2ed] leading-relaxed"></div>
+668:       </div>
+669:     </section>
+670: 
+671:     <!-- Section 5: Run History Drawer -->
+672:     <section id="history-section" class="card history-section hidden rounded-xl bg-[#120f16]/75 backdrop-blur-xl border border-[#f7a8a0]/15 p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+673:       <div class="history-header flex items-center justify-between pb-4 mb-4 border-b border-[#f7a8a0]/15">
+674:         <h2 class="font-display text-lg font-bold text-white">Test Run History</h2>
+675:         <button id="btn-refresh-history" class="btn btn-outline btn-sm px-3 py-1 rounded-md border border-[#e8d5b5]/30 text-xs text-[#ded2dc] hover:text-white">Refresh</button>
+676:       </div>
+677:       <div class="history-table-wrapper overflow-x-auto">
+678:         <table class="history-table w-full text-left text-xs border-collapse">
+679:           <thead>
+680:             <tr class="border-b border-[#f7a8a0]/15 text-[#a595a0] uppercase tracking-wider text-[10px]">
+681:               <th class="py-2.5 px-3">Time</th>
+682:               <th class="py-2.5 px-3">Type</th>
+683:               <th class="py-2.5 px-3">Prompt</th>
+684:               <th class="py-2.5 px-3">VUs</th>
+685:               <th class="py-2.5 px-3">Duration</th>
+686:               <th class="py-2.5 px-3">Status</th>
+687:               <th class="py-2.5 px-3">Error %</th>
+688:               <th class="py-2.5 px-3">p95</th>
+689:               <th class="py-2.5 px-3">Action</th>
+690:             </tr>
+691:           </thead>
+692:           <tbody id="history-table-body" class="divide-y divide-[#f7a8a0]/10 font-mono text-[11px]"></tbody>
+693:         </table>
+694:       </div>
+695:     </section>
+696:   </main>
+697: 
+698:   <script src="app.js"></script>
+699:   <script src="animations.js"></script>
+700: </body>
+701: </html>
+702: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

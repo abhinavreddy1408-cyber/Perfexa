@@ -8,7 +8,7 @@ import logging
 import time
 import uuid
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, UploadFile, File, Form
 from pydantic import BaseModel, ValidationError
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,6 +21,8 @@ from backend.app.services.k6_generator import build_and_validate_k6_script
 from backend.app.services.k6_runner import execute_k6_run
 from backend.app.services.llm_summary import generate_performance_summary
 from backend.app.services.docker_utils import get_effective_target_url
+from backend.app.services.code_analyzer import analyze_code_content, UnsupportedLanguageError, InvalidFileError
+from backend.app.services.llm_code_summary import generate_code_quality_summary
 from backend.app.api.websocket import ws_manager
 
 logger = logging.getLogger("routes")
@@ -220,3 +222,54 @@ async def get_run_live_metrics_endpoint(run_id: str):
     if not snapshot:
         return {"status": "waiting_or_completed", "run_id": run_id}
     return snapshot
+
+
+@router.post("/code-review")
+async def code_review_endpoint(
+    file: UploadFile = File(...),
+    run_ai_summary: bool = Form(True)
+):
+    """
+    Codebase Corrector endpoint: accepts a single source code file (.py or .js),
+    runs static analysis (Flake8 / ESLint), and returns structured findings plus
+    a grounded AI quality summary.
+    """
+    if not file or not file.filename:
+        raise HTTPException(status_code=400, detail="No file uploaded.")
+
+    filename = file.filename
+
+    try:
+        raw_bytes = await file.read()
+    except Exception as e:
+        logger.error(f"Failed to read uploaded file: {e}")
+        raise HTTPException(status_code=400, detail="Could not read uploaded file.")
+
+    if not raw_bytes or not raw_bytes.strip():
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    try:
+        content = raw_bytes.decode("utf-8")
+    except UnicodeDecodeError:
+        raise HTTPException(status_code=400, detail="Uploaded file contains binary data or invalid text encoding.")
+
+    try:
+        analysis_result = await asyncio.to_thread(analyze_code_content, filename, content)
+    except UnsupportedLanguageError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except InvalidFileError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Code analysis error for {filename}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Code analysis failed: {str(e)}")
+
+    ai_summary = ""
+    if run_ai_summary:
+        try:
+            ai_summary = await asyncio.to_thread(generate_code_quality_summary, analysis_result)
+        except Exception as e:
+            logger.error(f"Failed to generate AI code summary for {filename}: {e}", exc_info=True)
+            ai_summary = f"Analysis complete with {analysis_result['total_findings']} findings. AI summary generation encountered a temporary error."
+
+    analysis_result["ai_summary"] = ai_summary
+    return analysis_result

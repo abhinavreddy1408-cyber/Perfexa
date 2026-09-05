@@ -1,0 +1,15 @@
+Created At: 2026-09-06T02:50:12+05:30
+Completed At: 2026-09-06T02:50:13+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 795
+Total Bytes: 51226
+Showing lines 99 to 105
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+99:     scene.add(rootGroup);
+100: 
+101:     // High-Precision Multi-Magnitude Deep Space Starfield
+102:     const starCount = 460;
+103:     const starGeo = new THREE.BufferGeometry();
+104:     const starPos = new Float32Array(starCount * 3);
+105:     const starColors = new Float32Array(starCount * 3);
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

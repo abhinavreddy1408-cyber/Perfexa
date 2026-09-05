@@ -59,9 +59,21 @@ async def websocket_endpoint(websocket: WebSocket, run_id: str):
         ws_manager.disconnect(run_id, websocket)
 
 
+from fastapi.responses import FileResponse
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "service": "performance-testing-backend"}
+
+
+@app.get("/landing")
+async def landing_route():
+    return FileResponse(FRONTEND_DIR / "landing.html")
+
+
+@app.get("/app")
+async def app_route():
+    return FileResponse(FRONTEND_DIR / "app.html")
 
 
 # Mount frontend static directory if index.html exists

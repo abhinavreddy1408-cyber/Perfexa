@@ -1,0 +1,79 @@
+Created At: 2026-09-06T02:10:36+05:30
+Completed At: 2026-09-06T02:10:36+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 1086
+Total Bytes: 61564
+Showing lines 205 to 275
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+205:           let rough = 200;
+206:           let emR = 0, emG = 0, emB = 0;
+207: 
+208:           if (n < 0.46) {
+209:             // Deep obsidian / midnight sea
+210:             const oceanDepth = n / 0.46;
+211:             r = Math.floor(12 + oceanDepth * 12);
+212:             g = Math.floor(9 + oceanDepth * 10);
+213:             b = Math.floor(22 + oceanDepth * 18);
+214:             bump = 15;
+215:             rough = 35; // Glossy specular reflection on liquid
+216:           } else if (n < 0.52) {
+217:             // Shoreline / lowlands (warm bronze / rosewood)
+218:             const t = (n - 0.46) / 0.06;
+219:             r = Math.floor(65 + t * 45);
+220:             g = Math.floor(32 + t * 25);
+221:             b = Math.floor(45 + t * 30);
+222:             bump = Math.floor(40 + t * 40);
+223:             rough = 140;
+224:           } else if (n < 0.70) {
+225:             // Continental highlands (rose gold & terracotta terrain)
+226:             const t = (n - 0.52) / 0.18;
+227:             r = Math.floor(110 + t * 115);
+228:             g = Math.floor(58 + t * 75);
+229:             b = Math.floor(75 + t * 70);
+230:             bump = Math.floor(80 + t * 110);
+231:             rough = 210;
+232: 
+233:             // Subtle city / telemetry grid points along coastlines
+234:             if (n < 0.60 && ((x * 13 + y * 29) % 37 === 0)) {
+235:               emR = 252;
+236:               emG = 185;
+237:               emB = 170;
+238:             }
+239:           } else {
+240:             // Mountain peaks (crystalline quartz / snow ridges)
+241:             const t = Math.min(1, (n - 0.70) / 0.15);
+242:             r = Math.floor(225 + t * 30);
+243:             g = Math.floor(135 + t * 85);
+244:             b = Math.floor(145 + t * 75);
+245:             bump = Math.floor(190 + t * 65);
+246:             rough = 240;
+247:           }
+248: 
+249:           diffData.data[idx] = r;
+250:           diffData.data[idx + 1] = g;
+251:           diffData.data[idx + 2] = b;
+252:           diffData.data[idx + 3] = 255;
+253: 
+254:           bumpData.data[idx] = bump;
+255:           bumpData.data[idx + 1] = bump;
+256:           bumpData.data[idx + 2] = bump;
+257:           bumpData.data[idx + 3] = 255;
+258: 
+259:           roughData.data[idx] = rough;
+260:           roughData.data[idx + 1] = rough;
+261:           roughData.data[idx + 2] = rough;
+262:           roughData.data[idx + 3] = 255;
+263: 
+264:           emissData.data[idx] = emR;
+265:           emissData.data[idx + 1] = emG;
+266:           emissData.data[idx + 2] = emB;
+267:           emissData.data[idx + 3] = 255;
+268:         }
+269:       }
+270: 
+271:       diffCtx.putImageData(diffData, 0, 0);
+272:       bumpCtx.putImageData(bumpData, 0, 0);
+273:       roughCtx.putImageData(roughData, 0, 0);
+274:       emissCtx.putImageData(emissData, 0, 0);
+275: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

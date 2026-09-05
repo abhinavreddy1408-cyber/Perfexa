@@ -30,6 +30,9 @@ const scriptCodeBlock = document.getElementById("script-code-block");
 const alertBanner = document.getElementById("alert-banner");
 const alertMessage = document.getElementById("alert-message");
 const btnCloseAlert = document.getElementById("btn-close-alert");
+const aboutSection = document.getElementById("about-section");
+const btnAboutToggle = document.getElementById("btn-about-toggle");
+const btnCloseAbout = document.getElementById("btn-close-about");
 
 function showError(msg) {
   if (alertBanner && alertMessage) {
@@ -59,16 +62,17 @@ if (btnCloseAlert) {
 
 // Initialize Charts
 function initCharts() {
+  if (vusChart && latencyChart) return;
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
     animation: { duration: 300 },
     scales: {
-      x: { grid: { color: 'rgba(255, 255, 255, 0.08)' }, ticks: { color: '#8e8e8a' } },
-      y: { grid: { color: 'rgba(255, 255, 255, 0.08)' }, ticks: { color: '#8e8e8a' } }
+      x: { grid: { color: 'rgba(247, 168, 160, 0.08)' }, ticks: { color: '#a595a0' } },
+      y: { grid: { color: 'rgba(247, 168, 160, 0.08)' }, ticks: { color: '#a595a0' } }
     },
     plugins: {
-      legend: { labels: { color: '#b3b3ae' } }
+      legend: { labels: { color: '#faeade', font: { family: 'Space Grotesk' } } }
     }
   };
 
@@ -80,8 +84,8 @@ function initCharts() {
       datasets: [{
         label: 'Active VUs',
         data: [],
-        borderColor: '#ffffff',
-        backgroundColor: 'rgba(255, 255, 255, 0.12)',
+        borderColor: '#f7a8a0',
+        backgroundColor: 'rgba(247, 168, 160, 0.18)',
         tension: 0.3,
         fill: true
       }]
@@ -98,15 +102,15 @@ function initCharts() {
         {
           label: 'p95 Latency (ms)',
           data: [],
-          borderColor: '#f3f3f1',
-          backgroundColor: 'rgba(243, 243, 241, 0.08)',
+          borderColor: '#faeade',
+          backgroundColor: 'rgba(250, 234, 222, 0.12)',
           tension: 0.3
         },
         {
           label: 'Error %',
           data: [],
           borderColor: '#ef4444',
-          backgroundColor: 'rgba(239, 68, 68, 0.15)',
+          backgroundColor: 'rgba(239, 68, 68, 0.18)',
           tension: 0.3,
           yAxisID: 'y1'
         }
@@ -253,6 +257,7 @@ function renderIntentCard(data) {
   payloadPreview.textContent = JSON.stringify(data.synthetic_payloads, null, 2);
 
   intentSection.classList.remove("hidden");
+  if (window.PerfexaAnimations) PerfexaAnimations.revealIntentCard();
   intentSection.scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -291,6 +296,7 @@ function startLiveExecution(runId) {
   intentSection.classList.add("hidden");
   resultsSection.classList.add("hidden");
   liveDashboardSection.classList.remove("hidden");
+  if (window.PerfexaAnimations) PerfexaAnimations.revealLiveDashboard();
   liveDashboardSection.scrollIntoView({ behavior: 'smooth' });
 
   document.getElementById("run-id-display").textContent = `run_id: ${runId}`;
@@ -378,10 +384,19 @@ function updateLiveDashboardMetrics(snapshot, source = "websocket") {
   console.log(`[LIVE METRIC ${source.toUpperCase()}] ${snapshot.elapsed_sec}s | VUs: ${snapshot.vus} | RPS: ${snapshot.rps} | p95: ${snapshot.p95_ms}ms | Err%: ${(snapshot.error_rate * 100).toFixed(1)}%`);
 
   document.getElementById("live-elapsed").textContent = `${snapshot.elapsed_sec}s`;
-  document.getElementById("stat-vus").textContent = snapshot.vus;
-  document.getElementById("stat-rps").textContent = snapshot.rps;
-  document.getElementById("stat-p95").textContent = `${snapshot.p95_ms} ms`;
-  document.getElementById("stat-error-rate").textContent = `${(snapshot.error_rate * 100).toFixed(1)}%`;
+
+  // Animated stat tweens (falls back to direct assignment if animations.js not loaded)
+  if (window.PerfexaAnimations) {
+    PerfexaAnimations.tweenStatValue("stat-vus", snapshot.vus, { suffix: "", decimals: 0 });
+    PerfexaAnimations.tweenStatValue("stat-rps", snapshot.rps, { suffix: "", decimals: 1 });
+    PerfexaAnimations.tweenStatValue("stat-p95", snapshot.p95_ms, { suffix: " ms", decimals: 0 });
+    PerfexaAnimations.tweenStatValue("stat-error-rate", parseFloat((snapshot.error_rate * 100).toFixed(1)), { suffix: "%", decimals: 1 });
+  } else {
+    document.getElementById("stat-vus").textContent = snapshot.vus;
+    document.getElementById("stat-rps").textContent = snapshot.rps;
+    document.getElementById("stat-p95").textContent = `${snapshot.p95_ms} ms`;
+    document.getElementById("stat-error-rate").textContent = `${(snapshot.error_rate * 100).toFixed(1)}%`;
+  }
   document.getElementById("stat-failed-count").textContent = `${snapshot.failed_requests} failed (${snapshot.total_requests} total)`;
 
   // Update chart
@@ -395,6 +410,7 @@ function updateLiveDashboardMetrics(snapshot, source = "websocket") {
         vusChart.data.datasets[0].data.shift();
       }
       vusChart.update();
+      if (window.PerfexaAnimations) PerfexaAnimations.pulseChartContainer();
 
       latencyChart.data.labels.push(timeLabel);
       latencyChart.data.datasets[0].data.push(snapshot.p95_ms);
@@ -433,11 +449,16 @@ function loadRunResults(run, shouldScroll = true) {
   liveDashboardSection.classList.add("hidden");
   resultsSection.classList.remove("hidden");
   btnRunTest.disabled = false;
+  if (window.PerfexaAnimations) PerfexaAnimations.revealResultsSection();
 
   const metrics = run.metrics || {};
   const isPipelineFailure = run.status === "FAILED";
   const passed = metrics.passed;
   const noData = metrics.no_data === true || (!isPipelineFailure && metrics.total_requests === 0);
+  const maxErrLimit = (run.intent && run.intent.success_criteria && run.intent.success_criteria.max_error_rate !== undefined)
+    ? run.intent.success_criteria.max_error_rate
+    : 0.05;
+  const isErrorRateBreached = (metrics.threshold_failures || []).some(tf => tf.toLowerCase().includes("error rate")) || ((metrics.error_rate || 0) > maxErrLimit);
   const verdictBanner = document.getElementById("verdict-banner");
 
   if (isPipelineFailure) {
@@ -453,13 +474,14 @@ function loadRunResults(run, shouldScroll = true) {
     verdictBanner.textContent = "TEST FAILED (THRESHOLDS BREACHED)";
     verdictBanner.className = "verdict-banner verdict-fail";
   }
+  if (window.PerfexaAnimations) PerfexaAnimations.animateVerdictBanner(verdictBanner);
 
   // Scorecards
   const scorecardGrid = document.getElementById("scorecard-grid");
   if ((isPipelineFailure || noData) && (!metrics.total_requests || metrics.total_requests === 0)) {
     scorecardGrid.innerHTML = `
       <div class="stat-card" style="grid-column: 1 / -1; text-align: left; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); padding: 16px;">
-        <div style="font-weight: 600; color: #f87171; margin-bottom: 4px;">⚠️ No Load-Test Metrics Collected</div>
+        <div style="font-weight: 600; color: #f87171; margin-bottom: 4px;">No Load-Test Metrics Collected</div>
         <div style="font-size: 0.85rem; color: #94a3b8;">${isPipelineFailure ? 'The test run encountered a pipeline error before load metrics could be recorded.' : 'k6 completed but recorded zero requests — the target may have been unreachable or the script may have failed.'} See error details below.</div>
       </div>
     `;
@@ -468,7 +490,7 @@ function loadRunResults(run, shouldScroll = true) {
     if (metrics.threshold_failures && metrics.threshold_failures.length > 0) {
       failureReasonsHtml = `
         <div class="threshold-failures-box" style="grid-column: 1 / -1; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px;">
-          <div style="color: #ef4444; font-weight: 600; margin-bottom: 6px;">❌ Threshold Breaches Detected:</div>
+          <div style="color: #ef4444; font-weight: 600; margin-bottom: 6px;">Threshold Breaches Detected:</div>
           <ul style="margin: 0; padding-left: 20px; color: #fca5a5; font-size: 0.88rem;">
             ${metrics.threshold_failures.map(tf => `<li>${escapeHtml(tf)}</li>`).join("")}
           </ul>
@@ -496,7 +518,7 @@ function loadRunResults(run, shouldScroll = true) {
       </div>
       <div class="stat-card">
         <span class="stat-label">Error Rate</span>
-        <div class="stat-value" style="color: ${(metrics.error_rate || 0) >= 0.05 ? '#ef4444' : '#10b981'}">
+        <div class="stat-value" style="color: ${isErrorRateBreached ? '#ef4444' : '#10b981'}">
           ${metrics.error_percentage !== undefined ? metrics.error_percentage + '%' : 'N/A'}
         </div>
         <span class="stat-sub" style="color: #94a3b8;">${metrics.failed_requests !== undefined ? metrics.failed_requests + ' failed' : ''}</span>
@@ -556,6 +578,26 @@ btnCloseScript.addEventListener("click", () => {
   btnViewScript.setAttribute("aria-expanded", "false");
 });
 
+// About Section Toggle
+if (btnAboutToggle && aboutSection) {
+  btnAboutToggle.addEventListener("click", () => {
+    aboutSection.classList.toggle("hidden");
+    const isExpanded = !aboutSection.classList.contains("hidden");
+    btnAboutToggle.setAttribute("aria-expanded", String(isExpanded));
+    if (isExpanded) {
+      const navOffset = 90;
+      const elementPos = aboutSection.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({ top: Math.max(0, elementPos - navOffset), behavior: 'smooth' });
+    }
+  });
+}
+if (btnCloseAbout && aboutSection) {
+  btnCloseAbout.addEventListener("click", () => {
+    aboutSection.classList.add("hidden");
+    if (btnAboutToggle) btnAboutToggle.setAttribute("aria-expanded", "false");
+  });
+}
+
 // Run History
 btnHistoryToggle.addEventListener("click", () => {
   historySection.classList.toggle("hidden");
@@ -569,6 +611,7 @@ btnHistoryToggle.addEventListener("click", () => {
 document.getElementById("btn-refresh-history").addEventListener("click", () => refreshHistoryList(false));
 
 async function refreshHistoryList(autoLoadLatest = false) {
+  void autoLoadLatest;
   try {
     const res = await fetch("/api/runs");
     if (!res.ok) return;
@@ -589,9 +632,8 @@ async function refreshHistoryList(autoLoadLatest = false) {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "recent-pill-btn";
-        const icon = cr.test_type === "stress" ? "🔥" : cr.test_type === "soak" ? "⏳" : "✅";
         const verdictTag = cr.metrics.passed ? "PASS" : "FAIL (THR)";
-        btn.innerHTML = `<span>${icon}</span> <strong>${cr.test_type.toUpperCase()}</strong> <span>(${cr.virtual_users} VUs)</span> <span class="badge ${cr.metrics.passed ? 'badge-baseline' : 'badge-stress'}" style="padding: 1px 6px; font-size: 10px;">${verdictTag}</span>`;
+        btn.innerHTML = `<strong>${cr.test_type.toUpperCase()}</strong> <span>(${cr.virtual_users} VUs)</span> <span class="badge ${cr.metrics.passed ? 'badge-baseline' : 'badge-stress'}" style="padding: 1px 6px; font-size: 10px;">${verdictTag}</span>`;
         btn.addEventListener("click", () => fetchRunAndShowResults(cr.id, true));
         recentPillsContainer.appendChild(btn);
       });
@@ -616,6 +658,11 @@ async function refreshHistoryList(autoLoadLatest = false) {
         }
       }
 
+      const rMaxErrLimit = (r.intent && r.intent.success_criteria && r.intent.success_criteria.max_error_rate !== undefined)
+        ? r.intent.success_criteria.max_error_rate
+        : 0.05;
+      const rErrBreached = (m.threshold_failures || []).some(tf => tf.toLowerCase().includes("error rate")) || ((m.error_rate || 0) > rMaxErrLimit);
+
       tr.innerHTML = `
         <td>${dateStr}</td>
         <td><span class="badge badge-${r.test_type}">${r.test_type}</span></td>
@@ -623,7 +670,7 @@ async function refreshHistoryList(autoLoadLatest = false) {
         <td>${r.virtual_users}</td>
         <td>${r.duration}</td>
         <td>${statusBadge}</td>
-        <td style="color: ${m.error_rate > 0.05 ? '#ef4444' : '#10b981'}">${errText}</td>
+        <td style="color: ${rErrBreached ? '#ef4444' : '#10b981'}">${errText}</td>
         <td>${p95Text}</td>
         <td><button class="btn btn-sm btn-outline btn-load-run" data-id="${r.id}">View</button></td>
       `;
@@ -636,11 +683,310 @@ async function refreshHistoryList(autoLoadLatest = false) {
         fetchRunAndShowResults(id, true);
       });
     });
-  } catch (e) {}
+    if (window.PerfexaAnimations) PerfexaAnimations.animateHistoryRows();
+  } catch (e) {
+    console.warn("Could not refresh run history", e);
+  }
+}
+
+/* ==========================================================================
+   Codebase Corrector Logic (Single-file static analysis + AI quality review)
+   ========================================================================== */
+const btnModeLoadTest = document.getElementById("btn-mode-loadtest");
+const btnModeCorrector = document.getElementById("btn-mode-corrector");
+const chipToCorrector = document.getElementById("chip-to-corrector");
+const correctorSection = document.getElementById("corrector-section");
+const loadtestInputSection = document.getElementById("loadtest-input-section");
+
+const codeFileInput = document.getElementById("code-file-input");
+const uploadDropzone = document.getElementById("upload-dropzone");
+const selectedFileInfo = document.getElementById("selected-file-info");
+const selectedFileName = document.getElementById("selected-file-name");
+const selectedFileSize = document.getElementById("selected-file-size");
+const btnRemoveFile = document.getElementById("btn-remove-file");
+const btnAnalyzeCode = document.getElementById("btn-analyze-code");
+const correctorSpinner = document.getElementById("corrector-spinner");
+const correctorResults = document.getElementById("corrector-results");
+
+const correctorStatLang = document.getElementById("corrector-stat-lang");
+const correctorStatLines = document.getElementById("corrector-stat-lines");
+const correctorStatTotal = document.getElementById("corrector-stat-total");
+const correctorStatErrors = document.getElementById("corrector-stat-errors");
+const correctorStatWarnings = document.getElementById("corrector-stat-warnings");
+const correctorStatVerdict = document.getElementById("corrector-stat-verdict");
+const correctorStatStatus = document.getElementById("corrector-stat-status");
+const correctorAiSummary = document.getElementById("corrector-ai-summary");
+const findingsCountBadge = document.getElementById("findings-count-badge");
+const findingsEnginePill = document.getElementById("findings-engine-pill");
+const findingsList = document.getElementById("findings-list");
+
+let selectedCodeFile = null;
+
+function switchToLoadTesting() {
+  if (correctorSection) correctorSection.classList.add("hidden");
+  if (loadtestInputSection) loadtestInputSection.classList.remove("hidden");
+  if (btnModeLoadTest) {
+    btnModeLoadTest.classList.add("btn-primary");
+    btnModeLoadTest.classList.remove("btn-outline");
+  }
+  if (btnModeCorrector) {
+    btnModeCorrector.classList.add("btn-outline");
+    btnModeCorrector.classList.remove("btn-primary");
+  }
+}
+
+function switchToCorrector() {
+  if (loadtestInputSection) loadtestInputSection.classList.add("hidden");
+  if (intentSection) intentSection.classList.add("hidden");
+  if (liveDashboardSection) liveDashboardSection.classList.add("hidden");
+  if (resultsSection) resultsSection.classList.add("hidden");
+  if (correctorSection) {
+    correctorSection.classList.remove("hidden");
+    correctorSection.style.opacity = "1";
+    correctorSection.style.transform = "none";
+    if (window.gsap) {
+      window.gsap.fromTo(
+        correctorSection,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.35, ease: "power2.out", clearProps: "transform,opacity" }
+      );
+    }
+  }
+  if (btnModeCorrector) {
+    btnModeCorrector.classList.add("btn-primary");
+    btnModeCorrector.classList.remove("btn-outline");
+  }
+  if (btnModeLoadTest) {
+    btnModeLoadTest.classList.add("btn-outline");
+    btnModeLoadTest.classList.remove("btn-primary");
+  }
+}
+
+function clearSelectedCodeFile() {
+  selectedCodeFile = null;
+  if (codeFileInput) codeFileInput.value = "";
+  if (selectedFileInfo) selectedFileInfo.classList.add("hidden");
+  if (btnAnalyzeCode) btnAnalyzeCode.disabled = true;
+}
+
+function handleFileSelection(file) {
+  if (!file) return;
+
+  const name = file.name || "";
+  const ext = name.includes(".") ? name.substring(name.lastIndexOf(".")).toLowerCase() : "";
+
+  if (ext !== ".py" && ext !== ".js") {
+    showError("Language not yet supported — currently supports Python and JavaScript");
+    clearSelectedCodeFile();
+    return;
+  }
+
+  if (file.size === 0) {
+    showError("Uploaded file is empty.");
+    clearSelectedCodeFile();
+    return;
+  }
+
+  hideError();
+  selectedCodeFile = file;
+
+  if (selectedFileName) selectedFileName.textContent = file.name;
+  if (selectedFileSize) {
+    const sizeKb = (file.size / 1024).toFixed(1);
+    selectedFileSize.textContent = `(${sizeKb} KB)`;
+  }
+  if (selectedFileInfo) selectedFileInfo.classList.remove("hidden");
+  if (btnAnalyzeCode) btnAnalyzeCode.disabled = false;
+}
+
+// Dropzone & Input Listeners
+if (codeFileInput) {
+  codeFileInput.addEventListener("change", (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFileSelection(e.target.files[0]);
+    }
+  });
+}
+
+if (uploadDropzone) {
+  uploadDropzone.addEventListener("click", (e) => {
+    if (e.target === codeFileInput) return;
+    if (e.target && e.target.closest && e.target.closest("#btn-remove-file")) return;
+    if (codeFileInput) codeFileInput.click();
+  });
+
+  ["dragenter", "dragover"].forEach(evtName => {
+    uploadDropzone.addEventListener(evtName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadDropzone.classList.add("dragover");
+    });
+  });
+
+  ["dragleave", "dragend", "drop"].forEach(evtName => {
+    uploadDropzone.addEventListener(evtName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadDropzone.classList.remove("dragover");
+    });
+  });
+
+  uploadDropzone.addEventListener("drop", (e) => {
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileSelection(e.dataTransfer.files[0]);
+    }
+  });
+
+  uploadDropzone.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (codeFileInput) codeFileInput.click();
+    }
+  });
+}
+
+if (btnRemoveFile) {
+  btnRemoveFile.addEventListener("click", (e) => {
+    e.stopPropagation();
+    clearSelectedCodeFile();
+  });
+}
+
+if (btnModeLoadTest) {
+  btnModeLoadTest.addEventListener("click", switchToLoadTesting);
+}
+
+if (btnModeCorrector) {
+  btnModeCorrector.addEventListener("click", switchToCorrector);
+}
+
+if (chipToCorrector) {
+  chipToCorrector.addEventListener("click", switchToCorrector);
+}
+
+// Run Code Review
+if (btnAnalyzeCode) {
+  btnAnalyzeCode.addEventListener("click", async () => {
+    if (!selectedCodeFile) return;
+
+    hideError();
+    btnAnalyzeCode.disabled = true;
+    if (correctorSpinner) correctorSpinner.classList.remove("hidden");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedCodeFile);
+      formData.append("run_ai_summary", "true");
+
+      const response = await fetch("/api/code-review", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        showError(data.detail || "Code analysis failed. Please try again.");
+        btnAnalyzeCode.disabled = false;
+        if (correctorSpinner) correctorSpinner.classList.add("hidden");
+        return;
+      }
+
+      // Populate Scorecards
+      const lang = (data.language || "code").toUpperCase();
+      if (correctorStatLang) correctorStatLang.textContent = lang;
+      if (correctorStatLines) correctorStatLines.textContent = `${data.total_lines || 0} lines`;
+      if (correctorStatTotal) correctorStatTotal.textContent = data.total_findings || 0;
+      if (correctorStatErrors) correctorStatErrors.textContent = data.error_count || 0;
+      if (correctorStatWarnings) correctorStatWarnings.textContent = data.warning_count || 0;
+
+      if (correctorStatVerdict) {
+        if (data.total_findings === 0) {
+          correctorStatVerdict.innerHTML = '<span style="color: var(--success);">CLEAN</span>';
+          if (correctorStatStatus) correctorStatStatus.textContent = "0 defects";
+        } else if (data.error_count > 0) {
+          correctorStatVerdict.innerHTML = '<span style="color: var(--danger);">NEEDS FIXES</span>';
+          if (correctorStatStatus) correctorStatStatus.textContent = `${data.error_count} critical`;
+        } else {
+          correctorStatVerdict.innerHTML = '<span style="color: #f59e0b;">WARNINGS</span>';
+          if (correctorStatStatus) correctorStatStatus.textContent = `${data.warning_count} stylistic`;
+        }
+      }
+
+      // Render AI Summary
+      if (correctorAiSummary) {
+        if (data.ai_summary && window.marked) {
+          correctorAiSummary.innerHTML = marked.parse(data.ai_summary);
+        } else {
+          correctorAiSummary.textContent = data.ai_summary || "No summary available.";
+        }
+      }
+
+      // Render Findings List
+      if (findingsCountBadge) findingsCountBadge.textContent = data.total_findings || 0;
+      if (findingsEnginePill) {
+        findingsEnginePill.textContent = data.language === "python" ? "Engine: Flake8" : "Engine: ESLint";
+      }
+
+      if (findingsList) {
+        findingsList.innerHTML = "";
+        if (data.total_findings === 0) {
+          findingsList.innerHTML = `
+            <div class="finding-clean-card">
+              <h4 style="font-size: 15px; margin-bottom: 4px;">All Clean</h4>
+              <p style="font-size: 13px; opacity: 0.9;">No syntax errors, undeclared variables, or style violations detected. This file satisfies standard quality benchmarks.</p>
+            </div>
+          `;
+        } else {
+          (data.findings || []).forEach(f => {
+            const isErr = f.severity === "error";
+            const item = document.createElement("div");
+            item.className = "finding-item";
+            const location = f.location || `${data.filename || selectedCodeFile.name}:${f.line}:${f.column}`;
+            const contextSnippet = f.context_snippet || f.line_content || "";
+            item.innerHTML = `
+              <div class="finding-meta">
+                <span class="finding-line-pill">${escapeHtml(location)}</span>
+                <span class="finding-badge ${isErr ? 'finding-badge-error' : 'finding-badge-warning'}">${f.severity.toUpperCase()}</span>
+                <span class="finding-rule">${escapeHtml(f.rule)}</span>
+              </div>
+              <div class="finding-message">${escapeHtml(f.message)}</div>
+              ${contextSnippet ? `<pre class="finding-snippet">${escapeHtml(contextSnippet)}</pre>` : ''}
+            `;
+            findingsList.appendChild(item);
+          });
+        }
+      }
+
+      // Reveal Results
+      if (correctorResults) {
+        correctorResults.classList.remove("hidden");
+        correctorResults.style.opacity = "1";
+        correctorResults.style.transform = "none";
+        if (window.gsap) {
+          window.gsap.fromTo(
+            correctorResults,
+            { opacity: 0, y: 16 },
+            { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", clearProps: "transform,opacity" }
+          );
+        }
+        correctorResults.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+    } catch (err) {
+      showError("Unexpected error during code review: " + err.message);
+    } finally {
+      btnAnalyzeCode.disabled = false;
+      if (correctorSpinner) correctorSpinner.classList.add("hidden");
+    }
+  });
 }
 
 // Initialize on page load
 window.addEventListener("DOMContentLoaded", () => {
   initCharts();
   refreshHistoryList();
+  if (window.location.hash === "#corrector") {
+    switchToCorrector();
+  }
 });

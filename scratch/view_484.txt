@@ -1,0 +1,54 @@
+Created At: 2026-09-06T01:50:18+05:30
+Completed At: 2026-09-06T01:50:18+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 760
+Total Bytes: 48615
+Showing lines 600 to 645
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+600: 
+601:     <!-- Section 2: Understood Intent Review Card -->
+602:     <section id="intent-section" class="card intent-section hidden rounded-xl bg-[#120f16]/75 backdrop-blur-xl border border-[#f7a8a0]/15 p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+603:       <div class="section-header intent-header flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-[#f7a8a0]/15">
+604:         <div>
+605:           <div class="badge-row flex items-center gap-2 mb-2">
+606:             <span id="intent-badge-type" class="px-2.5 py-0.5 rounded bg-[#2a1724] border border-[#e0838a]/40 font-mono text-[11px] font-bold text-[#f7a8a0]">STRESS</span>
+607:             <span id="intent-badge-vus" class="px-2.5 py-0.5 rounded bg-[#1f1721] border border-[#f7a8a0]/30 font-mono text-[11px] font-semibold text-[#ffd1cc]">200 VUs</span>
+608:             <span id="intent-badge-duration" class="px-2.5 py-0.5 rounded bg-[#1f1721] border border-[#f7a8a0]/30 font-mono text-[11px] font-semibold text-[#ffd1cc]">20s</span>
+609:           </div>
+610:           <h3 id="intent-summary-title" class="font-display text-lg font-bold text-white">Extracted Test Intent</h3>
+611:           <p class="intent-step-hint text-xs text-[#baaab4] mt-0.5">AI analyzed your problem. Click the button to start the live k6 engine and generate fresh diagnostics.</p>
+612:         </div>
+613:         <button id="btn-run-test" class="btn btn-success btn-lg pulse-glow px-6 py-2.5 rounded-lg border border-[#f3e3cc] text-[#120e14] bg-gradient-to-r from-[#faeade] via-[#f3e3cc] to-[#ebd2ba] font-semibold text-xs hover:brightness-105 active:scale-[0.99] transition-all shadow-[0_0_20px_rgba(243,227,204,0.3)] shrink-0 flex items-center gap-2">
+614:           <span>Execute Load Test &amp; Generate Report</span>
+615:           <span class="text-sm">⚡</span>
+616:         </button>
+617:       </div>
+618: 
+619:       <div class="intent-grid grid grid-cols-1 md:grid-cols-2 gap-5">
+620:         <div class="intent-col space-y-4">
+621:           <div>
+622:             <h4 class="font-display text-xs font-semibold text-[#ffd1cc] tracking-wide uppercase mb-2">Endpoints &amp; Traffic</h4>
+623:             <div id="intent-endpoints-list" class="tag-list flex flex-wrap gap-2"></div>
+624:           </div>
+625:           <div>
+626:             <h4 class="font-display text-xs font-semibold text-[#ffd1cc] tracking-wide uppercase mb-2">Success Criteria (Thresholds)</h4>
+627:             <div id="intent-criteria" class="criteria-box p-3 rounded-lg bg-[#0a070e]/80 border border-[#e8d5b5]/20 text-xs text-[#faeade]"></div>
+628:           </div>
+629:         </div>
+630: 
+631:         <div class="intent-col space-y-4">
+632:           <div>
+633:             <h4 class="font-display text-xs font-semibold text-[#ffd1cc] tracking-wide uppercase mb-2">AI Assumptions &amp; Default Interpretations</h4>
+634:             <ul id="intent-assumptions" class="assumptions-list space-y-1 text-xs text-[#c8b9c2] list-disc list-inside"></ul>
+635:           </div>
+636:           <div>
+637:             <h4 class="font-display text-xs font-semibold text-[#ffd1cc] tracking-wide uppercase mb-2">Synthetic Payloads Sample</h4>
+638:             <pre id="intent-payload-preview" class="code-preview p-3 rounded-lg bg-[#0a070e]/90 border border-[#e8d5b5]/20 font-mono text-[11px] text-[#faeade] overflow-x-auto max-h-48"></pre>
+639:           </div>
+640:         </div>
+641:       </div>
+642:     </section>
+643: 
+644:     <!-- Section 3: Live Execution Dashboard -->
+645:     <section id="live-dashboard-section" class="card dashboard-section hidden rounded-xl bg-[#120f16]/75 backdrop-blur-xl border border-[#f7a8a0]/15 p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

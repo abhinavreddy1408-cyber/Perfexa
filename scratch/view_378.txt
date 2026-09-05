@@ -1,0 +1,34 @@
+Created At: 2026-09-06T01:40:51+05:30
+Completed At: 2026-09-06T01:40:51+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 791
+Total Bytes: 49685
+Showing lines 420 to 445
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+420:     <!-- Section: About & Platform Telemetry -->
+421:     <section id="about-section" class="card about-section hidden rounded-xl bg-[#120f16]/85 backdrop-blur-xl border border-[#f7a8a0]/25 p-5 sm:p-7 shadow-[0_12px_40px_rgba(0,0,0,0.6)] transition-all">
+422:       <div class="flex items-start justify-between gap-4 pb-4 mb-5 border-b border-[#f7a8a0]/15">
+423:         <div>
+424:           <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1b141d]/80 border border-[#f7a8a0]/30 font-mono text-[10px] font-semibold text-[#ffd1cc] uppercase tracking-wider mb-2">
+425:             System Architecture &amp; Runtime Telemetry
+426:           </div>
+427:           <h2 class="font-display text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-[#ffd1cc] via-[#f7a8a0] to-[#e0838a] bg-clip-text text-transparent">About Perfexa</h2>
+428:           <p class="text-xs text-[#baaab4] mt-1 max-w-2xl leading-relaxed">Perfexa is an autonomous load testing and intelligent diagnostics engine designed to evaluate high-throughput web applications with zero manual script-writing. It synthesizes k6 load suites from natural language prompts, streams real-time latency waveforms, and isolates concurrency bottlenecks.</p>
+429:         </div>
+430:         <button type="button" id="btn-close-about" class="px-3 py-1 rounded-md border border-[#e8d5b5]/30 hover:border-[#f7a8a0] text-xs text-[#ded2dc] hover:text-white transition-all shrink-0">Close &times;</button>
+431:       </div>
+432: 
+433:       <!-- Runtime Specifications Grid -->
+434:       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
+435:         <div class="p-3.5 rounded-lg bg-[#17121b]/80 border border-[#f7a8a0]/15 flex flex-col justify-between">
+436:           <div>
+437:             <div class="flex items-center justify-between mb-2">
+438:               <span class="text-[11px] font-mono uppercase text-[#a595a0]">Target Application</span>
+439:               <span class="flex items-center gap-1 text-[10px] font-medium text-emerald-400">
+440:                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span> LIVE
+441:               </span>
+442:             </div>
+443:             <div class="font-mono text-sm font-bold text-[#faeade] mb-1">127.0.0.1:8001 (FastAPI)</div>
+444:             <p class="text-[11px] text-[#8a7587] leading-snug">Dedicated local target service providing mock endpoints, database query simulation, and heavy CPU load targets.</p>
+445:           </div>
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

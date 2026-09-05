@@ -43,6 +43,9 @@ RULES:
     * "/api/heavy" or "/api/checkout" (POST, concurrency-sensitive, breaking point at ~150 concurrent requests)
     * "/api/login" (POST, authentication endpoint)
   - You MUST document every defaulted value or interpretation in the "assumptions_made" list!
+- Under "success_criteria":
+  * "p95_ms": Target 95th percentile latency in ms (e.g. 200 for baseline, 500 for soak/stress).
+  * "max_error_rate": NEVER default max_error_rate to 0.0 unless the user explicitly demands zero tolerance or 0% errors. Use a sane tolerance: 0.01 (1%) for baseline tests or 0.05 (5%) for soak/stress tests.
 - Under "synthetic_payloads", provide a dictionary mapping each endpoint path (e.g. "/api/login") to a list of 5-10 realistic JSON payload objects.
 
 JSON SCHEMA STRUCTURE:
@@ -131,6 +134,18 @@ def extract_intent_and_payloads(
         parsed = MergedIntentPayloadResponse.model_validate(data)
         # Ensure target_url is populated and normalized for environment
         parsed.intent.target_url = get_effective_target_url(parsed.intent.target_url or active_target)
+
+        # Safeguard: Never allow max_error_rate to default to 0.0 unless user explicitly requested 0%/zero tolerance
+        zero_tolerance_requested = bool(
+            re.search(r"\b(0%|zero\s+(percent|tolerance|errors?))\b", prompt, re.IGNORECASE)
+        )
+        if parsed.intent.success_criteria.max_error_rate <= 0.0 and not zero_tolerance_requested:
+            default_err = 0.05 if parsed.intent.test_type in ("stress", "soak") else 0.01
+            parsed.intent.success_criteria.max_error_rate = default_err
+            parsed.intent.assumptions_made.append(
+                f"Defaulted max_error_rate tolerance to {default_err * 100:.1f}% (avoiding strict 0.0% false failures)."
+            )
+
         return parsed
     except ValidationError as ve:
         logger.error(f"Pydantic schema validation error: {ve}")

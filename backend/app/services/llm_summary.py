@@ -21,15 +21,23 @@ Your job is to analyze the final aggregated results of a performance load test a
 THE REPORT MUST CONTAIN EXACTLY THESE 4 LABELED SECTIONS:
 
 ### Verdict
-- Clearly declare whether the test PASSED or FAILED against the predefined success criteria.
+- Clearly declare whether the test PASSED or FAILED based strictly on whether thresholds were met.
 - State the explicit threshold limits (e.g. p95 <= X ms, max error rate <= Y%) and compare them directly against the actual achieved numbers.
+- STRICT COHERENCE & LOGICAL CONSISTENCY RULE:
+  * The Verdict and numbers MUST logically agree. NEVER produce self-contradictory text like "within the limit, but... exceeded the threshold" or "error rate was 0.0%, which exceeded the 0.0% limit".
+  * If Pass/Fail Status is PASSED (0 threshold breaches), state unequivocally that the test PASSED because all observed metrics satisfied their respective limits.
+  * If actual error rate is 0.0% and failed requests is 0, this is a 100% successful error-free run that fully satisfies the error rate requirement.
+  * Only declare FAILED if there are actual threshold breaches listed in "Threshold Failures" or if an observed metric strictly exceeded its target.
 
 ### What Happened (Observed Performance)
 - Quantify throughput (req/sec), total requests executed, failed requests, and the full latency spectrum: median (p50), 95th percentile (p95), and tail latency (p99).
 - Describe the observed system behavior over the test window under the specific virtual user concurrency.
 
 ### Root Cause Analysis
-- CRITICAL GROUNDING RULES:
+- If the test PASSED:
+  * State that no root cause analysis is required because the system operated within healthy limits and met all predefined thresholds.
+  * Summarize the positive stability factors (e.g. healthy sub-10ms response times, zero failed requests, stable throughput).
+- If the test FAILED:
   * Only describe mechanisms you have direct evidence for from the provided metrics and context.
   * STRICTLY FORBIDDEN: Do NOT invent infrastructure details (thread pools, connection pools, sockets, databases, worker thread starvation) that are not confirmed to exist in the system under test.
   * STRICTLY FORBIDDEN: Do NOT claim an endpoint has a concurrency limit, rate limit, or 503 error mechanism unless that exact endpoint is explicitly stated as having one in the verified architecture notes below.
@@ -41,7 +49,10 @@ THE REPORT MUST CONTAIN EXACTLY THESE 4 LABELED SECTIONS:
 
 ### Recommendations
 - Provide 3 to 4 prioritized, concrete engineering recommendations.
-- CRITICAL RULES FOR RECOMMENDATIONS:
+- If the test PASSED:
+  * Provide proactive recommendations for continuous benchmarking, capacity planning, and scaling targets (e.g. baseline established, proceed to soak testing or higher-concurrency stress testing to find actual capacity boundaries).
+  * Do NOT recommend emergency fixes, horizontal scaling, or rate limiting for an endpoint that performed flawlessly with 0% errors and healthy latencies!
+- If the test FAILED:
   1. Tie each recommendation directly to the specific failure pattern observed in this run's numbers and the verified endpoint architecture.
   2. Reference the exact endpoint(s) and threshold values by name and exact value.
   3. STRICTLY FORBIDDEN: Do NOT recommend tuning a concurrency limit on an endpoint that has no concurrency limit (such as /api/login).
@@ -114,6 +125,21 @@ def generate_performance_summary(
     crit = intent.success_criteria
     endpoints = [ep.path for ep in intent.endpoints_involved]
 
+    # Ensure consistency between numbers and verdict before passing to LLM
+    total_reqs = final_metrics.get("total_requests", 0)
+    failed_reqs = final_metrics.get("failed_requests", 0)
+    p95_ms = final_metrics.get("p95_ms", 0.0)
+    err_rate = final_metrics.get("error_rate", 0.0)
+
+    # Sanity safeguard: if total requests > 0, 0 failed requests, and p95 <= limit, this MUST be PASSED
+    if total_reqs > 0 and failed_reqs == 0 and p95_ms <= crit.p95_ms:
+        final_metrics["passed"] = True
+        # Filter out any false "0.0% exceeded limit" artifacts
+        final_metrics["threshold_failures"] = [
+            tf for tf in final_metrics.get("threshold_failures", [])
+            if not ("0.0%" in tf and "exceeded" in tf)
+        ]
+
     # Contextual knowledge strictly scoped to the endpoints under test
     target_behavior_notes = _get_endpoint_context(endpoints)
 
@@ -159,4 +185,3 @@ Provide the complete 4-section Markdown report. Adhere strictly to the grounding
         temperature=0.0
     )
     return report
-

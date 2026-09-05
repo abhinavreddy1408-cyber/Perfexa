@@ -1,0 +1,94 @@
+Created At: 2026-09-06T02:10:39+05:30
+Completed At: 2026-09-06T02:10:39+05:30
+File Path: `file:///c:/Users/abhin/Desktop/hackthon/frontend/index.html`
+Total Lines: 1086
+Total Bytes: 61564
+Showing lines 440 to 525
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+440:     const moonLeftTex = generateMoonTexture(55, true, 256, 128);
+441:     const moonRightTex = generateMoonTexture(88, false, 256, 128);
+442: 
+443:     // 1. Grand Center Planet System (Realistic Celestial Body)
+444:     const centralPlanetGroup = new THREE.Group();
+445:     centralPlanetGroup.position.set(0, 15, -50);
+446: 
+447:     // Realistic Planet Surface
+448:     const planetGeo = new THREE.SphereGeometry(22.5, 64, 64);
+449:     const planetMat = new THREE.MeshStandardMaterial({
+450:       map: planetTexs.diffuse,
+451:       bumpMap: planetTexs.bump,
+452:       bumpScale: 0.7,
+453:       roughnessMap: planetTexs.roughness,
+454:       roughness: 0.5,
+455:       metalness: 0.12,
+456:       emissiveMap: planetTexs.emissive,
+457:       emissive: 0xffffff,
+458:       emissiveIntensity: 0.4
+459:     });
+460:     const planetMesh = new THREE.Mesh(planetGeo, planetMat);
+461:     // Realistic axial tilt (23.4 degrees)
+462:     planetMesh.rotation.z = THREE.MathUtils.degToRad(23.4);
+463:     centralPlanetGroup.add(planetMesh);
+464: 
+465:     // Atmospheric Cloud Layer (drifts over continents)
+466:     const cloudGeo = new THREE.SphereGeometry(22.85, 64, 64);
+467:     const cloudMat = new THREE.MeshStandardMaterial({
+468:       map: cloudTex,
+469:       transparent: true,
+470:       opacity: 0.48,
+471:       roughness: 0.9,
+472:       blending: THREE.NormalBlending,
+473:       depthWrite: false
+474:     });
+475:     const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+476:     cloudMesh.rotation.z = THREE.MathUtils.degToRad(23.4);
+477:     centralPlanetGroup.add(cloudMesh);
+478: 
+479:     // Atmospheric Fresnel Glow Shell
+480:     const atmoGlow = createAtmosphereGlow(22.5);
+481:     centralPlanetGroup.add(atmoGlow);
+482: 
+483:     // Realistic Planetary Thin Ring
+484:     const ringGeo = new THREE.RingGeometry(31, 49, 96);
+485:     const ringMat = new THREE.MeshStandardMaterial({
+486:       map: ringTex,
+487:       side: THREE.DoubleSide,
+488:       transparent: true,
+489:       opacity: 0.72,
+490:       roughness: 0.45,
+491:       metalness: 0.15
+492:     });
+493:     const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+494:     ringMesh.rotation.x = Math.PI / 2.5;
+495:     ringMesh.rotation.y = Math.PI / 9;
+496:     centralPlanetGroup.add(ringMesh);
+497: 
+498:     rootGroup.add(centralPlanetGroup);
+499: 
+500:     // 2. Realistic Companion Satellite Moons
+501:     // Left Moon (Cratered Lunar/Ice Satellite)
+502:     const moonLeftGroup = new THREE.Group();
+503:     moonLeftGroup.position.set(-76, 18, -35);
+504:     const moonLeftGeo = new THREE.SphereGeometry(6.8, 48, 48);
+505:     const moonLeftMat = new THREE.MeshStandardMaterial({
+506:       map: moonLeftTex.diffuse,
+507:       bumpMap: moonLeftTex.bump,
+508:       bumpScale: 0.8,
+509:       roughness: 0.82,
+510:       metalness: 0.08
+511:     });
+512:     const moonLeftMesh = new THREE.Mesh(moonLeftGeo, moonLeftMat);
+513:     moonLeftGroup.add(moonLeftMesh);
+514:     rootGroup.add(moonLeftGroup);
+515: 
+516:     // Right Moon (Sandalwood / Amber Desert Satellite)
+517:     const moonRightGroup = new THREE.Group();
+518:     moonRightGroup.position.set(76, 14, -35);
+519:     const moonRightGeo = new THREE.SphereGeometry(6.2, 48, 48);
+520:     const moonRightMat = new THREE.MeshStandardMaterial({
+521:       map: moonRightTex.diffuse,
+522:       bumpMap: moonRightTex.bump,
+523:       bumpScale: 0.65,
+524:       roughness: 0.75,
+525:       metalness: 0.1
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
