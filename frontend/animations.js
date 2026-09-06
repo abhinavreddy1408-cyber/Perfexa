@@ -55,14 +55,13 @@
     // Pipeline cards staggered
     safeFrom(".pipeline-card", { y: 16, opacity: 0, duration: 0.4, stagger: 0.08 }, "-=0.15");
 
-    // Input section card
-    safeFrom(".input-section", { y: 16, opacity: 0, duration: 0.4 }, "-=0.15");
-
-    // Preset label and chips
-    safeFrom(".preset-label, .chip", { y: 10, opacity: 0, duration: 0.3, stagger: 0.06 }, "-=0.15");
-
-    // Benchmark shortcuts
-    safeFrom(".benchmark-shortcuts", { y: 10, opacity: 0, duration: 0.3 }, "-=0.1");
+    // Ensure input section and query box are ALWAYS visible with full opacity
+    const inputSec = document.getElementById("loadtest-input-section");
+    if (inputSec) {
+      inputSec.style.opacity = "1";
+      inputSec.style.visibility = "visible";
+      inputSec.style.transform = "none";
+    }
   }
 
   // =========================================================================

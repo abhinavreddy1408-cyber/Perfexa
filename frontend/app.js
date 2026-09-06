@@ -724,14 +724,18 @@ let selectedCodeFile = null;
 
 function switchToLoadTesting() {
   if (correctorSection) correctorSection.classList.add("hidden");
-  if (loadtestInputSection) loadtestInputSection.classList.remove("hidden");
+  if (loadtestInputSection) {
+    loadtestInputSection.classList.remove("hidden");
+    loadtestInputSection.style.opacity = "1";
+    loadtestInputSection.style.visibility = "visible";
+    loadtestInputSection.style.transform = "none";
+    loadtestInputSection.style.display = "block";
+  }
   if (btnModeLoadTest) {
-    btnModeLoadTest.classList.add("btn-primary");
-    btnModeLoadTest.classList.remove("btn-outline");
+    btnModeLoadTest.className = "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-gradient-to-r from-[#faeade] via-[#f3e3cc] to-[#ebd2ba] text-[#120e14] shadow-[0_0_12px_rgba(243,227,204,0.35)] transition-all";
   }
   if (btnModeCorrector) {
-    btnModeCorrector.classList.add("btn-outline");
-    btnModeCorrector.classList.remove("btn-primary");
+    btnModeCorrector.className = "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium text-[#c4b5bc] hover:text-[#faeade] hover:bg-[#251c23]/60 transition-colors";
   }
 }
 
@@ -743,7 +747,9 @@ function switchToCorrector() {
   if (correctorSection) {
     correctorSection.classList.remove("hidden");
     correctorSection.style.opacity = "1";
+    correctorSection.style.visibility = "visible";
     correctorSection.style.transform = "none";
+    correctorSection.style.display = "block";
     if (window.gsap) {
       window.gsap.fromTo(
         correctorSection,
@@ -753,12 +759,10 @@ function switchToCorrector() {
     }
   }
   if (btnModeCorrector) {
-    btnModeCorrector.classList.add("btn-primary");
-    btnModeCorrector.classList.remove("btn-outline");
+    btnModeCorrector.className = "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-gradient-to-r from-[#faeade] via-[#f3e3cc] to-[#ebd2ba] text-[#120e14] shadow-[0_0_12px_rgba(243,227,204,0.35)] transition-all";
   }
   if (btnModeLoadTest) {
-    btnModeLoadTest.classList.add("btn-outline");
-    btnModeLoadTest.classList.remove("btn-primary");
+    btnModeLoadTest.className = "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium text-[#c4b5bc] hover:text-[#faeade] hover:bg-[#251c23]/60 transition-colors";
   }
 }
 
@@ -982,11 +986,120 @@ if (btnAnalyzeCode) {
   });
 }
 
+/* ==========================================================================
+   View Navigation: Merged Landing Page <-> Web Dashboard
+   ========================================================================== */
+function showLandingView() {
+  const landingView = document.getElementById("landing-view");
+  const dashboardView = document.getElementById("dashboard-view");
+  if (landingView) {
+    landingView.classList.remove("hidden");
+    landingView.style.display = "block";
+  }
+  if (dashboardView) {
+    dashboardView.classList.add("hidden");
+    dashboardView.style.display = "none";
+  }
+  window.scrollTo({ top: 0, behavior: "instant" });
+  window.dispatchEvent(new Event("resize"));
+}
+
+function showDashboardView(targetSection) {
+  const landingView = document.getElementById("landing-view");
+  const dashboardView = document.getElementById("dashboard-view");
+  if (landingView) {
+    landingView.classList.add("hidden");
+    landingView.style.display = "none";
+  }
+  if (dashboardView) {
+    dashboardView.classList.remove("hidden");
+    dashboardView.style.display = "block";
+    dashboardView.style.opacity = "1";
+    dashboardView.style.visibility = "visible";
+  }
+  
+  switchToLoadTesting();
+
+  if (targetSection === "history") {
+    if (historySection) {
+      historySection.classList.remove("hidden");
+      historySection.scrollIntoView({ behavior: "smooth" });
+    }
+  } else if (targetSection === "about") {
+    if (aboutSection) {
+      aboutSection.classList.remove("hidden");
+      aboutSection.scrollIntoView({ behavior: "smooth" });
+    }
+  } else if (targetSection === "corrector") {
+    switchToCorrector();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } else {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // Ensure charts re-render nicely if already initialized
+  if (vusChart && latencyChart) {
+    vusChart.resize();
+    latencyChart.resize();
+  }
+
+  // Ensure prompt query box is 100% visible and ready
+  if (loadtestInputSection) {
+    loadtestInputSection.style.opacity = "1";
+    loadtestInputSection.style.visibility = "visible";
+    loadtestInputSection.style.transform = "none";
+    loadtestInputSection.style.display = "block";
+  }
+}
+
+// Expose on window for inline onclick handlers
+window.showLandingView = showLandingView;
+window.showDashboardView = showDashboardView;
+window.switchToLoadTesting = switchToLoadTesting;
+window.switchToCorrector = switchToCorrector;
+
+// Wire up navigation controls
+function initViewNavigation() {
+  // All buttons on landing page that launch the dashboard
+  document.querySelectorAll(".btn-launch-dashboard").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const target = btn.getAttribute("data-target") || "";
+      showDashboardView(target);
+    });
+  });
+
+  // Top navbar button to return to Landing Page
+  const btnBackLanding = document.getElementById("btn-back-landing");
+  if (btnBackLanding) {
+    btnBackLanding.addEventListener("click", (e) => {
+      e.preventDefault();
+      showLandingView();
+    });
+  }
+
+  // Brand logo in dashboard header returns to landing
+  const brandBack = document.getElementById("brand-back-landing");
+  if (brandBack) {
+    brandBack.addEventListener("click", (e) => {
+      e.preventDefault();
+      showLandingView();
+    });
+  }
+}
+
 // Initialize on page load
 window.addEventListener("DOMContentLoaded", () => {
   initCharts();
   refreshHistoryList();
-  if (window.location.hash === "#corrector") {
-    switchToCorrector();
+  initViewNavigation();
+
+  // Strict requirement: "each time i refresh i should see the landing page"
+  // Clear any hash so refresh never jumps directly to subviews
+  if (window.location.hash) {
+    history.replaceState(null, "", window.location.pathname);
   }
+  showLandingView();
 });
+
+

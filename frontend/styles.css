@@ -1329,3 +1329,59 @@ textarea:focus {
   text-align: center;
   color: var(--success);
 }
+
+/* ==========================================================================
+   Merged Landing & Dashboard View Transition Styles
+   ========================================================================== */
+.view-section {
+  width: 100%;
+  transition: opacity 0.3s ease;
+}
+
+.view-section.hidden {
+  display: none !important;
+}
+
+/* Guarantee Query Box & Input Section are ALWAYS visible and prominent */
+#loadtest-input-section {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+#loadtest-input-section.hidden {
+  display: none !important;
+}
+
+#prompt-form {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  width: 100% !important;
+}
+
+#prompt-input {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  width: 100% !important;
+  min-height: 86px !important;
+  font-family: inherit !important;
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  color: #faeade !important;
+  background-color: rgba(10, 7, 14, 0.85) !important;
+  border: 1.5px solid rgba(232, 213, 181, 0.35) !important;
+  border-radius: 8px !important;
+  padding: 12px 14px !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+}
+
+#prompt-input:focus {
+  border-color: #f7a8a0 !important;
+  box-shadow: 0 0 16px rgba(247, 168, 160, 0.4), inset 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+  outline: none !important;
+}
+
