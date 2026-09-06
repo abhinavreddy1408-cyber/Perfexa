@@ -66,6 +66,17 @@ function safeSetHtml(id, html) {
   if (el) el.innerHTML = html;
 }
 
+// Unified API fetch helper with hybrid backend routing
+function apiFetch(endpoint, options = {}) {
+  const base = (window.PerfexaFirebase && window.PerfexaFirebase.getApiBaseUrl)
+    ? window.PerfexaFirebase.getApiBaseUrl()
+    : "";
+  const fullUrl = endpoint.startsWith("http")
+    ? endpoint
+    : `${base}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
+  return fetch(fullUrl, options);
+}
+
 if (btnCloseAlert) {
   btnCloseAlert.addEventListener("click", hideError);
 }
@@ -207,7 +218,7 @@ promptForm.addEventListener("submit", async (e) => {
   analyzeSpinner.classList.remove("hidden");
 
   try {
-    const res = await fetch("/api/intent", {
+    const res = await apiFetch("/api/intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt: promptText })
@@ -278,7 +289,7 @@ btnRunTest.addEventListener("click", async () => {
   btnRunTest.disabled = true;
 
   try {
-    const res = await fetch("/api/runs", {
+    const res = await apiFetch("/api/runs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -294,6 +305,22 @@ btnRunTest.addEventListener("click", async () => {
     
     const runInfo = await res.json();
     currentRunId = runInfo.run_id;
+
+    // Sync initial run metadata to Cloud Firestore
+    if (window.PerfexaFirebase && window.PerfexaFirebase.saveRunToFirestore) {
+      window.PerfexaFirebase.saveRunToFirestore({
+        id: currentRunId,
+        prompt: promptInput.value,
+        test_type: currentIntentData.intent ? currentIntentData.intent.test_type : "baseline",
+        status: "RUNNING",
+        target_url: currentIntentData.intent ? currentIntentData.intent.target_url : "",
+        virtual_users: currentIntentData.intent ? currentIntentData.intent.virtual_users : 10,
+        duration: currentIntentData.intent ? currentIntentData.intent.duration : "30s",
+        intent: currentIntentData.intent,
+        synthetic_payloads: currentIntentData.synthetic_payloads
+      });
+    }
+
     startLiveExecution(currentRunId);
   } catch (err) {
     showError("Could not launch load test: " + err.message);
@@ -323,12 +350,30 @@ function connectWebSocket(runId) {
     activeWebSocket.close();
   }
 
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = `${protocol}//${window.location.host}/ws/runs/${runId}`;
-  activeWebSocket = new WebSocket(wsUrl);
+  let wsUrl;
+  const base = (window.PerfexaFirebase && window.PerfexaFirebase.getApiBaseUrl)
+    ? window.PerfexaFirebase.getApiBaseUrl()
+    : window.location.origin;
+
+  try {
+    const url = new URL(base, window.location.href);
+    const wsProtocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    wsUrl = `${wsProtocol}//${url.host}/ws/runs/${runId}`;
+  } catch (e) {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    wsUrl = `${protocol}//${window.location.host}/ws/runs/${runId}`;
+  }
+
+  try {
+    activeWebSocket = new WebSocket(wsUrl);
+  } catch (err) {
+    console.warn("Could not initiate WebSocket, falling back to polling:", err);
+    startPollingFallback(runId);
+    return;
+  }
 
   activeWebSocket.onopen = () => {
-    console.log("WebSocket connected for run", runId);
+    console.log("WebSocket connected for run", runId, "at", wsUrl);
   };
 
   activeWebSocket.onmessage = (event) => {
@@ -365,14 +410,14 @@ function startPollingFallback(runId) {
   console.log("[POLLING FALLBACK] Started HTTP polling fallback for run:", runId);
   pollingInterval = setInterval(async () => {
     try {
-      const res = await fetch(`/api/runs/${runId}`);
+      const res = await apiFetch(`/api/runs/${runId}`);
       if (!res.ok) return;
       const data = await res.json();
       if (data.status === "COMPLETED" || data.status === "FAILED") {
         clearInterval(pollingInterval);
         loadRunResults(data);
       } else {
-        const metricRes = await fetch(`/api/runs/${runId}/metrics`);
+        const metricRes = await apiFetch(`/api/runs/${runId}/metrics`);
         if (metricRes.ok) {
           const m = await metricRes.json();
           if (m.vus !== undefined) updateLiveDashboardMetrics(m, "polling");
@@ -580,13 +625,29 @@ function loadRunResults(run, shouldScroll = true) {
   if (shouldScroll && resultsSection) {
     resultsSection.scrollIntoView({ behavior: 'smooth' });
   }
+
+  // Persist completed test run and AI diagnostic report to Cloud Firestore
+  if (window.PerfexaFirebase && window.PerfexaFirebase.saveRunToFirestore && run && run.id) {
+    window.PerfexaFirebase.saveRunToFirestore(run);
+  }
 }
+
+// In-memory cache for fast cloud run viewing
+window.__perfexaCachedRuns = window.__perfexaCachedRuns || new Map();
 
 async function fetchRunAndShowResults(runId, shouldScroll = true) {
   try {
-    const res = await fetch(`/api/runs/${runId}`);
-    if (!res.ok) return;
-    const run = await res.json();
+    let run = window.__perfexaCachedRuns.get(runId);
+    if (!run) {
+      const res = await apiFetch(`/api/runs/${runId}`);
+      if (res.ok) {
+        run = await res.json();
+      }
+    }
+    if (!run) {
+      console.warn("Run not found in local backend or cache:", runId);
+      return;
+    }
     if (run.prompt && promptInput) {
       promptInput.value = run.prompt;
     }
@@ -643,9 +704,39 @@ document.getElementById("btn-refresh-history").addEventListener("click", () => r
 async function refreshHistoryList(autoLoadLatest = false) {
   void autoLoadLatest;
   try {
-    const res = await fetch("/api/runs");
-    if (!res.ok) return;
-    const runs = await res.json();
+    let localRuns = [];
+    try {
+      const res = await apiFetch("/api/runs");
+      if (res.ok) {
+        localRuns = await res.json();
+      }
+    } catch (netErr) {
+      console.warn("Could not query local backend for runs:", netErr);
+    }
+
+    let cloudRuns = [];
+    if (window.PerfexaFirebase && window.PerfexaFirebase.fetchUserRunsFromFirestore) {
+      try {
+        cloudRuns = await window.PerfexaFirebase.fetchUserRunsFromFirestore();
+      } catch (cloudErr) {
+        console.warn("Could not fetch cloud runs from Firestore:", cloudErr);
+      }
+    }
+
+    // Merge runs by unique ID, prioritizing newer records
+    const runMap = new Map();
+    cloudRuns.forEach(cr => {
+      runMap.set(cr.id, { ...cr, isCloud: true });
+      window.__perfexaCachedRuns.set(cr.id, cr);
+    });
+    localRuns.forEach(lr => {
+      const existing = runMap.get(lr.id);
+      runMap.set(lr.id, { ...lr, isLocal: true, isCloud: existing?.isCloud || false });
+      window.__perfexaCachedRuns.set(lr.id, lr);
+    });
+
+    const runs = Array.from(runMap.values()).sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+
     historyCountSpan.textContent = runs.length;
 
     const telemetryRuns = document.getElementById("telemetry-runs-count");
@@ -663,7 +754,8 @@ async function refreshHistoryList(autoLoadLatest = false) {
         btn.type = "button";
         btn.className = "recent-pill-btn";
         const verdictTag = cr.metrics.passed ? "PASS" : "FAIL (THR)";
-        btn.innerHTML = `<strong>${cr.test_type.toUpperCase()}</strong> <span>(${cr.virtual_users} VUs)</span> <span class="badge ${cr.metrics.passed ? 'badge-baseline' : 'badge-stress'}" style="padding: 1px 6px; font-size: 10px;">${verdictTag}</span>`;
+        const cloudIcon = cr.isCloud ? '<span style="color: #f4a6a0; font-size: 9px; margin-left: 2px;">☁</span>' : '';
+        btn.innerHTML = `<strong>${cr.test_type.toUpperCase()}</strong> <span>(${cr.virtual_users} VUs)</span> <span class="badge ${cr.metrics.passed ? 'badge-baseline' : 'badge-stress'}" style="padding: 1px 6px; font-size: 10px;">${verdictTag}</span>${cloudIcon}`;
         btn.addEventListener("click", () => fetchRunAndShowResults(cr.id, true));
         recentPillsContainer.appendChild(btn);
       });
@@ -688,6 +780,8 @@ async function refreshHistoryList(autoLoadLatest = false) {
         }
       }
 
+      const cloudTag = r.isCloud ? `<span class="badge" style="background: rgba(244,166,160,0.12); color: #f4a6a0; border: 1px solid rgba(244,166,160,0.25); font-size: 9px; padding: 0 4px; margin-left: 4px;">☁ Cloud</span>` : "";
+
       const rMaxErrLimit = (r.intent && r.intent.success_criteria && r.intent.success_criteria.max_error_rate !== undefined)
         ? r.intent.success_criteria.max_error_rate
         : 0.05;
@@ -695,10 +789,10 @@ async function refreshHistoryList(autoLoadLatest = false) {
 
       tr.innerHTML = `
         <td>${dateStr}</td>
-        <td><span class="badge badge-${r.test_type}">${r.test_type}</span></td>
-        <td>${escapeHtml(r.prompt.substring(0, 35))}...</td>
-        <td>${r.virtual_users}</td>
-        <td>${r.duration}</td>
+        <td><span class="badge badge-${r.test_type}">${r.test_type}</span>${cloudTag}</td>
+        <td>${escapeHtml((r.prompt || "").substring(0, 35))}...</td>
+        <td>${r.virtual_users || "-"}</td>
+        <td>${r.duration || "-"}</td>
         <td>${statusBadge}</td>
         <td style="color: ${rErrBreached ? '#ef4444' : '#10b981'}">${errText}</td>
         <td>${p95Text}</td>
@@ -912,7 +1006,7 @@ if (btnAnalyzeCode) {
       formData.append("file", selectedCodeFile);
       formData.append("run_ai_summary", "true");
 
-      const response = await fetch("/api/code-review", {
+      const response = await apiFetch("/api/code-review", {
         method: "POST",
         body: formData
       });
@@ -1118,9 +1212,330 @@ function initViewNavigation() {
   }
 }
 
+// ===========================================================================
+// FIREBASE AUTHENTICATION & HYBRID BACKEND UI CONTROLLER
+// ===========================================================================
+function initFirebaseAuthUI() {
+  const modalAuth = document.getElementById("modal-firebase-auth");
+  const btnCloseAuth = document.getElementById("btn-close-auth-modal");
+  const btnOpenAuthLanding = document.getElementById("btn-open-auth-landing");
+  const btnOpenAuthDashboard = document.getElementById("btn-open-auth-dashboard");
+  const authForm = document.getElementById("auth-form");
+  const authEmail = document.getElementById("auth-email");
+  const authPassword = document.getElementById("auth-password");
+  const authName = document.getElementById("auth-name");
+  const authNameGroup = document.getElementById("auth-name-group");
+  const authTitle = document.getElementById("auth-modal-title");
+  const authDesc = document.getElementById("auth-modal-desc");
+  const btnAuthSubmit = document.getElementById("btn-auth-submit");
+  const btnAuthToggleMode = document.getElementById("btn-auth-toggle-mode");
+  const authErrorBanner = document.getElementById("auth-error-banner");
+  const authErrorMessage = document.getElementById("auth-error-message");
+  const btnAuthGoogle = document.getElementById("btn-auth-google");
+  const btnAuthAnonymous = document.getElementById("btn-auth-anonymous");
+
+  const userProfileLanding = document.getElementById("user-profile-landing");
+  const userProfileDashboard = document.getElementById("user-profile-dashboard");
+  const btnUserMenuLanding = document.getElementById("btn-user-menu-landing");
+  const btnUserMenuDashboard = document.getElementById("btn-user-menu-dashboard");
+  const menuUserDropdown = document.getElementById("menu-user-dropdown");
+  const btnAuthSignout = document.getElementById("btn-auth-signout");
+
+  const modalBackend = document.getElementById("modal-backend-settings");
+  const btnCloseBackend = document.getElementById("btn-close-backend-modal");
+  const btnCancelBackend = document.getElementById("btn-cancel-backend-modal");
+  const btnBackendLanding = document.getElementById("btn-backend-settings-landing");
+  const btnBackendDashboard = document.getElementById("btn-backend-settings-dashboard");
+  const btnUserOpenSettings = document.getElementById("btn-user-open-settings");
+  const inputBackendUrl = document.getElementById("input-backend-url");
+  const btnTestBackend = document.getElementById("btn-test-backend-connection");
+  const btnSaveBackend = document.getElementById("btn-save-backend-url");
+  const btnResetBackend = document.getElementById("btn-reset-backend-url");
+  const backendPingStatus = document.getElementById("backend-ping-status");
+  const backendPingMessage = document.getElementById("backend-ping-message");
+
+  let isSignUpMode = false;
+
+  function showAuthModal() {
+    if (modalAuth) {
+      modalAuth.classList.remove("hidden");
+      if (authErrorBanner) authErrorBanner.classList.add("hidden");
+      if (authEmail) authEmail.focus();
+    }
+  }
+
+  function hideAuthModal() {
+    if (modalAuth) modalAuth.classList.add("hidden");
+    if (authErrorBanner) authErrorBanner.classList.add("hidden");
+  }
+
+  function showAuthError(msg) {
+    if (authErrorBanner && authErrorMessage) {
+      authErrorMessage.textContent = msg;
+      authErrorBanner.classList.remove("hidden");
+    }
+  }
+
+  if (btnOpenAuthLanding) btnOpenAuthLanding.addEventListener("click", showAuthModal);
+  if (btnOpenAuthDashboard) btnOpenAuthDashboard.addEventListener("click", showAuthModal);
+  if (btnCloseAuth) btnCloseAuth.addEventListener("click", hideAuthModal);
+
+  // Close modal when clicking outside
+  if (modalAuth) {
+    modalAuth.addEventListener("click", (e) => {
+      if (e.target === modalAuth) hideAuthModal();
+    });
+  }
+
+  // Toggle mode (Sign In <-> Sign Up)
+  if (btnAuthToggleMode) {
+    btnAuthToggleMode.addEventListener("click", () => {
+      isSignUpMode = !isSignUpMode;
+      if (authErrorBanner) authErrorBanner.classList.add("hidden");
+      if (isSignUpMode) {
+        if (authTitle) authTitle.textContent = "Create Perfexa Account";
+        if (authDesc) authDesc.textContent = "Register to sync synthetic load test data & telemetry to Cloud Firestore.";
+        if (authNameGroup) authNameGroup.classList.remove("hidden");
+        if (btnAuthSubmit) btnAuthSubmit.textContent = "Create Account";
+        btnAuthToggleMode.innerHTML = "Already have an account? Sign In &rarr;";
+      } else {
+        if (authTitle) authTitle.textContent = "Sign In to Perfexa";
+        if (authDesc) authDesc.textContent = "Persist your synthetic test runs, telemetry records, and AI diagnostics directly to Cloud Firestore.";
+        if (authNameGroup) authNameGroup.classList.add("hidden");
+        if (btnAuthSubmit) btnAuthSubmit.textContent = "Sign In";
+        btnAuthToggleMode.innerHTML = "Need an account? Create one &rarr;";
+      }
+    });
+  }
+
+  // Auth Form Submit
+  if (authForm) {
+    authForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!window.PerfexaFirebase) return;
+      const email = authEmail?.value?.trim() || "";
+      const password = authPassword?.value || "";
+      const name = authName?.value?.trim() || "";
+
+      if (btnAuthSubmit) btnAuthSubmit.disabled = true;
+      try {
+        if (isSignUpMode) {
+          await window.PerfexaFirebase.signUpWithEmail(email, password, name);
+        } else {
+          await window.PerfexaFirebase.signInWithEmail(email, password);
+        }
+        hideAuthModal();
+        if (authForm) authForm.reset();
+      } catch (err) {
+        showAuthError(err.message || "Authentication failed.");
+      } finally {
+        if (btnAuthSubmit) btnAuthSubmit.disabled = false;
+      }
+    });
+  }
+
+  // Google Sign-In
+  if (btnAuthGoogle) {
+    btnAuthGoogle.addEventListener("click", async () => {
+      if (!window.PerfexaFirebase) return;
+      try {
+        await window.PerfexaFirebase.signInWithGoogle();
+        hideAuthModal();
+      } catch (err) {
+        if (err.code !== "auth/popup-closed-by-user") {
+          showAuthError(err.message || "Google sign-in failed.");
+        }
+      }
+    });
+  }
+
+  // Anonymous / Guest Mode
+  if (btnAuthAnonymous) {
+    btnAuthAnonymous.addEventListener("click", async () => {
+      if (!window.PerfexaFirebase) return;
+      try {
+        await window.PerfexaFirebase.signInAnonymously();
+        hideAuthModal();
+      } catch (err) {
+        showAuthError(err.message || "Guest authentication failed.");
+      }
+    });
+  }
+
+  // User Profile Popover positioning & toggling
+  function toggleUserMenu(anchorBtn) {
+    if (!menuUserDropdown) return;
+    const isHidden = menuUserDropdown.classList.contains("hidden");
+    if (isHidden && anchorBtn) {
+      const rect = anchorBtn.getBoundingClientRect();
+      menuUserDropdown.style.top = `${rect.bottom + 8}px`;
+      menuUserDropdown.style.left = `${Math.max(16, rect.right - 288)}px`;
+      menuUserDropdown.classList.remove("hidden");
+    } else {
+      menuUserDropdown.classList.add("hidden");
+    }
+  }
+
+  if (btnUserMenuLanding) {
+    btnUserMenuLanding.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleUserMenu(btnUserMenuLanding);
+    });
+  }
+  if (btnUserMenuDashboard) {
+    btnUserMenuDashboard.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleUserMenu(btnUserMenuDashboard);
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (menuUserDropdown && !menuUserDropdown.contains(e.target)) {
+      menuUserDropdown.classList.add("hidden");
+    }
+  });
+
+  // Sign Out
+  if (btnAuthSignout) {
+    btnAuthSignout.addEventListener("click", async () => {
+      if (window.PerfexaFirebase) {
+        await window.PerfexaFirebase.signOutUser();
+      }
+      if (menuUserDropdown) menuUserDropdown.classList.add("hidden");
+    });
+  }
+
+  // Backend Settings Modal
+  function showBackendModal() {
+    if (modalBackend) {
+      modalBackend.classList.remove("hidden");
+      if (menuUserDropdown) menuUserDropdown.classList.add("hidden");
+      if (inputBackendUrl && window.PerfexaFirebase) {
+        inputBackendUrl.value = window.PerfexaFirebase.getApiBaseUrl();
+      }
+      if (backendPingStatus) backendPingStatus.classList.add("hidden");
+    }
+  }
+  function hideBackendModal() {
+    if (modalBackend) modalBackend.classList.add("hidden");
+  }
+
+  if (btnBackendLanding) btnBackendLanding.addEventListener("click", showBackendModal);
+  if (btnBackendDashboard) btnBackendDashboard.addEventListener("click", showBackendModal);
+  if (btnUserOpenSettings) btnUserOpenSettings.addEventListener("click", showBackendModal);
+  if (btnCloseBackend) btnCloseBackend.addEventListener("click", hideBackendModal);
+  if (btnCancelBackend) btnCancelBackend.addEventListener("click", hideBackendModal);
+
+  if (modalBackend) {
+    modalBackend.addEventListener("click", (e) => {
+      if (e.target === modalBackend) hideBackendModal();
+    });
+  }
+
+  // Test Ping
+  if (btnTestBackend && inputBackendUrl) {
+    btnTestBackend.addEventListener("click", async () => {
+      const candidateUrl = inputBackendUrl.value.trim();
+      btnTestBackend.disabled = true;
+      btnTestBackend.textContent = "Pinging...";
+      if (backendPingStatus && backendPingMessage) {
+        backendPingStatus.classList.remove("hidden");
+        backendPingStatus.className = "p-3 rounded-lg text-xs leading-snug font-mono bg-[#1a141f] text-[#ded2dc]";
+        backendPingMessage.textContent = "Connecting to " + candidateUrl + "...";
+      }
+
+      const result = await window.PerfexaFirebase.checkBackendHealth(candidateUrl);
+      btnTestBackend.disabled = false;
+      btnTestBackend.textContent = "Test Ping";
+
+      if (backendPingStatus && backendPingMessage) {
+        if (result.ok) {
+          backendPingStatus.className = "p-3 rounded-lg text-xs leading-snug font-mono bg-emerald-950/40 border border-emerald-500/40 text-emerald-200";
+          backendPingMessage.textContent = `SUCCESS: Backend online (${result.data?.service || "ok"})`;
+        } else {
+          backendPingStatus.className = "p-3 rounded-lg text-xs leading-snug font-mono bg-red-950/40 border border-red-500/40 text-red-200";
+          backendPingMessage.textContent = `FAILED: ${result.error}. Ensure backend is running.`;
+        }
+      }
+    });
+  }
+
+  // Save Backend URL
+  if (btnSaveBackend && inputBackendUrl) {
+    btnSaveBackend.addEventListener("click", () => {
+      const val = inputBackendUrl.value.trim();
+      if (window.PerfexaFirebase) {
+        window.PerfexaFirebase.setApiBaseUrl(val);
+      }
+      hideBackendModal();
+      updateBackendStatusDots();
+      refreshHistoryList();
+    });
+  }
+
+  // Reset to Default
+  if (btnResetBackend && inputBackendUrl) {
+    btnResetBackend.addEventListener("click", () => {
+      if (window.PerfexaFirebase) {
+        window.PerfexaFirebase.setApiBaseUrl("");
+        inputBackendUrl.value = window.PerfexaFirebase.getApiBaseUrl();
+      }
+      if (backendPingStatus) backendPingStatus.classList.add("hidden");
+    });
+  }
+
+  // Update Status Dots
+  async function updateBackendStatusDots() {
+    const dotLanding = document.getElementById("backend-status-dot-landing");
+    const dotDashboard = document.getElementById("backend-status-dot-dashboard");
+    if (!window.PerfexaFirebase) return;
+    const health = await window.PerfexaFirebase.checkBackendHealth();
+    const colorClass = health.ok ? "bg-emerald-400" : "bg-amber-400";
+    if (dotLanding) dotLanding.className = `w-1.5 h-1.5 rounded-full ${colorClass}`;
+    if (dotDashboard) dotDashboard.className = `w-1.5 h-1.5 rounded-full ${colorClass}`;
+  }
+
+  // Listen to Firebase Auth State Changes
+  if (window.PerfexaFirebase && window.PerfexaFirebase.onAuthChange) {
+    window.PerfexaFirebase.onAuthChange((user) => {
+      const openBtnLanding = document.getElementById("btn-open-auth-landing");
+      const openBtnDashboard = document.getElementById("btn-open-auth-dashboard");
+
+      if (user) {
+        const name = user.displayName || user.email?.split("@")[0] || "User";
+        const email = user.email || "Anonymous Guest";
+        const initial = (name[0] || "U").toUpperCase();
+
+        if (userProfileLanding) userProfileLanding.classList.remove("hidden");
+        if (userProfileDashboard) userProfileDashboard.classList.remove("hidden");
+        if (openBtnLanding) openBtnLanding.classList.add("hidden");
+        if (openBtnDashboard) openBtnDashboard.classList.add("hidden");
+
+        safeSetText("user-email-landing", email);
+        safeSetText("user-email-dashboard", email);
+        safeSetText("user-avatar-landing", initial);
+        safeSetText("user-avatar-dashboard", initial);
+        safeSetText("menu-user-name", name);
+        safeSetText("menu-user-email", email);
+        safeSetText("menu-user-avatar", initial);
+      } else {
+        if (userProfileLanding) userProfileLanding.classList.add("hidden");
+        if (userProfileDashboard) userProfileDashboard.classList.add("hidden");
+        if (openBtnLanding) openBtnLanding.classList.remove("hidden");
+        if (openBtnDashboard) openBtnDashboard.classList.remove("hidden");
+      }
+
+      refreshHistoryList();
+    });
+  }
+
+  updateBackendStatusDots();
+}
+
 // Initialize on page load
 window.addEventListener("DOMContentLoaded", () => {
   initCharts();
+  initFirebaseAuthUI();
   refreshHistoryList();
   initViewNavigation();
 
