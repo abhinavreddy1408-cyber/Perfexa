@@ -68,12 +68,12 @@ async def health_check():
 
 @app.get("/landing")
 async def landing_route():
-    return FileResponse(FRONTEND_DIR / "landing.html")
+    return FileResponse(FRONTEND_DIR / "index.html")
 
 
 @app.get("/app")
 async def app_route():
-    return FileResponse(FRONTEND_DIR / "app.html")
+    return FileResponse(FRONTEND_DIR / "index.html")
 
 
 # Mount frontend static directory if index.html exists

@@ -49,3 +49,5 @@ Thumbs.db
 
 .temp_code/
 node_modules/
+scratch/
+stitch_assets/
