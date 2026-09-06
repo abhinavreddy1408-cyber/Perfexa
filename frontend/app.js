@@ -56,6 +56,16 @@ function escapeHtml(text) {
     .replace(/'/g, "&#039;");
 }
 
+function safeSetText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+function safeSetHtml(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+
 if (btnCloseAlert) {
   btnCloseAlert.addEventListener("click", hideError);
 }
@@ -293,14 +303,16 @@ btnRunTest.addEventListener("click", async () => {
 
 function startLiveExecution(runId) {
   // Switch sections
-  intentSection.classList.add("hidden");
-  resultsSection.classList.add("hidden");
-  liveDashboardSection.classList.remove("hidden");
-  if (window.PerfexaAnimations) PerfexaAnimations.revealLiveDashboard();
-  liveDashboardSection.scrollIntoView({ behavior: 'smooth' });
+  if (intentSection) intentSection.classList.add("hidden");
+  if (resultsSection) resultsSection.classList.add("hidden");
+  if (liveDashboardSection) {
+    liveDashboardSection.classList.remove("hidden");
+    if (window.PerfexaAnimations) PerfexaAnimations.revealLiveDashboard();
+    liveDashboardSection.scrollIntoView({ behavior: 'smooth' });
+  }
 
-  document.getElementById("run-id-display").textContent = `run_id: ${runId}`;
-  document.getElementById("run-status-text").textContent = "INITIALIZING SCRIPT...";
+  safeSetText("run-id-display", `run_id: ${runId}`);
+  safeSetText("run-status-text", "INITIALIZING SCRIPT...");
 
   resetCharts();
   connectWebSocket(runId);
@@ -341,7 +353,7 @@ function connectWebSocket(runId) {
     console.log("WebSocket closed", e);
     // If closed while the test is still actively running, fall back to HTTP polling
     const statusText = document.getElementById("run-status-text")?.textContent || "";
-    if (statusText !== "COMPLETED" && statusText !== "FAILED" && !liveDashboardSection.classList.contains("hidden")) {
+    if (statusText !== "COMPLETED" && statusText !== "FAILED" && liveDashboardSection && !liveDashboardSection.classList.contains("hidden")) {
       console.warn("WebSocket closed mid-run, falling back to HTTP polling");
       startPollingFallback(runId);
     }
@@ -383,7 +395,8 @@ function updateLiveDashboardMetrics(snapshot, source = "websocket") {
 
   console.log(`[LIVE METRIC ${source.toUpperCase()}] ${snapshot.elapsed_sec}s | VUs: ${snapshot.vus} | RPS: ${snapshot.rps} | p95: ${snapshot.p95_ms}ms | Err%: ${(snapshot.error_rate * 100).toFixed(1)}%`);
 
-  document.getElementById("live-elapsed").textContent = `${snapshot.elapsed_sec}s`;
+  safeSetText("live-elapsed", `${snapshot.elapsed_sec}s`);
+  safeSetText("live-stat-elapsed", `${snapshot.elapsed_sec}s`);
 
   // Animated stat tweens (falls back to direct assignment if animations.js not loaded)
   if (window.PerfexaAnimations) {
@@ -391,13 +404,18 @@ function updateLiveDashboardMetrics(snapshot, source = "websocket") {
     PerfexaAnimations.tweenStatValue("stat-rps", snapshot.rps, { suffix: "", decimals: 1 });
     PerfexaAnimations.tweenStatValue("stat-p95", snapshot.p95_ms, { suffix: " ms", decimals: 0 });
     PerfexaAnimations.tweenStatValue("stat-error-rate", parseFloat((snapshot.error_rate * 100).toFixed(1)), { suffix: "%", decimals: 1 });
-  } else {
-    document.getElementById("stat-vus").textContent = snapshot.vus;
-    document.getElementById("stat-rps").textContent = snapshot.rps;
-    document.getElementById("stat-p95").textContent = `${snapshot.p95_ms} ms`;
-    document.getElementById("stat-error-rate").textContent = `${(snapshot.error_rate * 100).toFixed(1)}%`;
   }
-  document.getElementById("stat-failed-count").textContent = `${snapshot.failed_requests} failed (${snapshot.total_requests} total)`;
+
+  safeSetText("stat-vus", snapshot.vus);
+  safeSetText("live-stat-vus", snapshot.vus);
+  safeSetText("stat-rps", snapshot.rps);
+  safeSetText("live-stat-rps", snapshot.rps);
+  safeSetText("stat-p95", `${snapshot.p95_ms} ms`);
+  safeSetText("live-stat-p95", `${snapshot.p95_ms} ms`);
+  safeSetText("stat-error-rate", `${(snapshot.error_rate * 100).toFixed(1)}%`);
+  safeSetText("live-stat-errors", `${(snapshot.error_rate * 100).toFixed(1)}%`);
+  safeSetText("live-stat-p50", `${snapshot.p50_ms || 0} ms`);
+  safeSetText("stat-failed-count", `${snapshot.failed_requests} failed (${snapshot.total_requests} total)`);
 
   // Update chart
   if (vusChart && latencyChart) {
@@ -426,14 +444,14 @@ function updateLiveDashboardMetrics(snapshot, source = "websocket") {
 }
 
 function handleStatusUpdate(status, data) {
-  document.getElementById("run-status-text").textContent = status.replace(/_/g, ' ');
-  if (data && data.script) {
+  safeSetText("run-status-text", status.replace(/_/g, ' '));
+  if (data && data.script && scriptCodeBlock) {
     scriptCodeBlock.textContent = data.script;
   }
   if (status === "FAILED") {
     const err = data && data.error ? data.error : "Load test run failed during execution.";
     showError("Execution Failure: " + err);
-    btnRunTest.disabled = false;
+    if (btnRunTest) btnRunTest.disabled = false;
   }
   if (status === "COMPLETED" || status === "FAILED") {
     if (activeWebSocket) activeWebSocket.close();
@@ -446,9 +464,9 @@ function handleStatusUpdate(status, data) {
 
 
 function loadRunResults(run, shouldScroll = true) {
-  liveDashboardSection.classList.add("hidden");
-  resultsSection.classList.remove("hidden");
-  btnRunTest.disabled = false;
+  if (liveDashboardSection) liveDashboardSection.classList.add("hidden");
+  if (resultsSection) resultsSection.classList.remove("hidden");
+  if (btnRunTest) btnRunTest.disabled = false;
   if (window.PerfexaAnimations) PerfexaAnimations.revealResultsSection();
 
   const metrics = run.metrics || {};
@@ -461,93 +479,105 @@ function loadRunResults(run, shouldScroll = true) {
   const isErrorRateBreached = (metrics.threshold_failures || []).some(tf => tf.toLowerCase().includes("error rate")) || ((metrics.error_rate || 0) > maxErrLimit);
   const verdictBanner = document.getElementById("verdict-banner");
 
-  if (isPipelineFailure) {
-    verdictBanner.textContent = "RUN FAILED: PIPELINE ERROR";
-    verdictBanner.className = "verdict-banner verdict-fail";
-  } else if (noData) {
-    verdictBanner.textContent = "NO DATA COLLECTED (TEST INCONCLUSIVE)";
-    verdictBanner.className = "verdict-banner verdict-fail";
-  } else if (passed === true) {
-    verdictBanner.textContent = "TEST PASSED (ALL THRESHOLDS MET)";
-    verdictBanner.className = "verdict-banner verdict-pass";
-  } else {
-    verdictBanner.textContent = "TEST FAILED (THRESHOLDS BREACHED)";
-    verdictBanner.className = "verdict-banner verdict-fail";
+  if (verdictBanner) {
+    if (isPipelineFailure) {
+      verdictBanner.textContent = "RUN FAILED: PIPELINE ERROR";
+      verdictBanner.className = "verdict-banner verdict-fail";
+    } else if (noData) {
+      verdictBanner.textContent = "NO DATA COLLECTED (TEST INCONCLUSIVE)";
+      verdictBanner.className = "verdict-banner verdict-fail";
+    } else if (passed === true) {
+      verdictBanner.textContent = "TEST PASSED (ALL THRESHOLDS MET)";
+      verdictBanner.className = "verdict-banner verdict-pass";
+    } else {
+      verdictBanner.textContent = "TEST FAILED (THRESHOLDS BREACHED)";
+      verdictBanner.className = "verdict-banner verdict-fail";
+    }
+    if (window.PerfexaAnimations) PerfexaAnimations.animateVerdictBanner(verdictBanner);
   }
-  if (window.PerfexaAnimations) PerfexaAnimations.animateVerdictBanner(verdictBanner);
+
+  // Update summary scorecard elements if present in static template
+  safeSetText("summary-stat-p95", `${metrics.p95_ms !== undefined ? metrics.p95_ms + 'ms' : '0ms'}`);
+  safeSetText("summary-stat-p50", `${metrics.p50_ms !== undefined ? metrics.p50_ms + 'ms' : '0ms'}`);
+  safeSetText("summary-stat-rps", `${metrics.avg_rps !== undefined ? metrics.avg_rps + ' RPS' : '0 RPS'}`);
+  safeSetText("summary-stat-errors", `${metrics.error_percentage !== undefined ? metrics.error_percentage + '%' : '0%'}`);
 
   // Scorecards
   const scorecardGrid = document.getElementById("scorecard-grid");
-  if ((isPipelineFailure || noData) && (!metrics.total_requests || metrics.total_requests === 0)) {
-    scorecardGrid.innerHTML = `
-      <div class="stat-card" style="grid-column: 1 / -1; text-align: left; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); padding: 16px;">
-        <div style="font-weight: 600; color: #f87171; margin-bottom: 4px;">No Load-Test Metrics Collected</div>
-        <div style="font-size: 0.85rem; color: #94a3b8;">${isPipelineFailure ? 'The test run encountered a pipeline error before load metrics could be recorded.' : 'k6 completed but recorded zero requests — the target may have been unreachable or the script may have failed.'} See error details below.</div>
-      </div>
-    `;
-  } else {
-    let failureReasonsHtml = "";
-    if (metrics.threshold_failures && metrics.threshold_failures.length > 0) {
-      failureReasonsHtml = `
-        <div class="threshold-failures-box" style="grid-column: 1 / -1; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px;">
-          <div style="color: #ef4444; font-weight: 600; margin-bottom: 6px;">Threshold Breaches Detected:</div>
-          <ul style="margin: 0; padding-left: 20px; color: #fca5a5; font-size: 0.88rem;">
-            ${metrics.threshold_failures.map(tf => `<li>${escapeHtml(tf)}</li>`).join("")}
-          </ul>
+  if (scorecardGrid) {
+    if ((isPipelineFailure || noData) && (!metrics.total_requests || metrics.total_requests === 0)) {
+      scorecardGrid.innerHTML = `
+        <div class="stat-card" style="grid-column: 1 / -1; text-align: left; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); padding: 16px;">
+          <div style="font-weight: 600; color: #f87171; margin-bottom: 4px;">No Load-Test Metrics Collected</div>
+          <div style="font-size: 0.85rem; color: #94a3b8;">${isPipelineFailure ? 'The test run encountered a pipeline error before load metrics could be recorded.' : 'k6 completed but recorded zero requests — the target may have been unreachable or the script may have failed.'} See error details below.</div>
+        </div>
+      `;
+    } else {
+      let failureReasonsHtml = "";
+      if (metrics.threshold_failures && metrics.threshold_failures.length > 0) {
+        failureReasonsHtml = `
+          <div class="threshold-failures-box" style="grid-column: 1 / -1; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px;">
+            <div style="color: #ef4444; font-weight: 600; margin-bottom: 6px;">Threshold Breaches Detected:</div>
+            <ul style="margin: 0; padding-left: 20px; color: #fca5a5; font-size: 0.88rem;">
+              ${metrics.threshold_failures.map(tf => `<li>${escapeHtml(tf)}</li>`).join("")}
+            </ul>
+          </div>
+        `;
+      }
+
+      scorecardGrid.innerHTML = `
+        ${failureReasonsHtml}
+        <div class="stat-card">
+          <span class="stat-label">Total Requests</span>
+          <div class="stat-value">${metrics.total_requests !== undefined ? metrics.total_requests : 'N/A'}</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Throughput</span>
+          <div class="stat-value">${metrics.avg_rps !== undefined ? metrics.avg_rps + ' req/s' : 'N/A'}</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">p50 Latency</span>
+          <div class="stat-value">${metrics.p50_ms !== undefined ? metrics.p50_ms + ' ms' : 'N/A'}</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">p95 Latency</span>
+          <div class="stat-value">${metrics.p95_ms !== undefined ? metrics.p95_ms + ' ms' : 'N/A'}</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Error Rate</span>
+          <div class="stat-value" style="color: ${isErrorRateBreached ? '#ef4444' : '#10b981'}">
+            ${metrics.error_percentage !== undefined ? metrics.error_percentage + '%' : 'N/A'}
+          </div>
+          <span class="stat-sub" style="color: #94a3b8;">${metrics.failed_requests !== undefined ? metrics.failed_requests + ' failed' : ''}</span>
         </div>
       `;
     }
-
-    scorecardGrid.innerHTML = `
-      ${failureReasonsHtml}
-      <div class="stat-card">
-        <span class="stat-label">Total Requests</span>
-        <div class="stat-value">${metrics.total_requests !== undefined ? metrics.total_requests : 'N/A'}</div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">Throughput</span>
-        <div class="stat-value">${metrics.avg_rps !== undefined ? metrics.avg_rps + ' req/s' : 'N/A'}</div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">p50 Latency</span>
-        <div class="stat-value">${metrics.p50_ms !== undefined ? metrics.p50_ms + ' ms' : 'N/A'}</div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">p95 Latency</span>
-        <div class="stat-value">${metrics.p95_ms !== undefined ? metrics.p95_ms + ' ms' : 'N/A'}</div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">Error Rate</span>
-        <div class="stat-value" style="color: ${isErrorRateBreached ? '#ef4444' : '#10b981'}">
-          ${metrics.error_percentage !== undefined ? metrics.error_percentage + '%' : 'N/A'}
-        </div>
-        <span class="stat-sub" style="color: #94a3b8;">${metrics.failed_requests !== undefined ? metrics.failed_requests + ' failed' : ''}</span>
-      </div>
-    `;
   }
 
   // Render markdown report or explicit error state
-  const reportBody = document.getElementById("ai-report-body");
-  if (run.ai_report && window.marked) {
-    reportBody.innerHTML = marked.parse(run.ai_report);
-  } else if (isPipelineFailure) {
-    reportBody.innerHTML = `
-      <div class="pipeline-error-box" style="background: rgba(239, 68, 68, 0.06); border-left: 4px solid #ef4444; padding: 16px; border-radius: 4px;">
-        <h4 style="color: #ef4444; margin-top: 0; margin-bottom: 8px;">Pipeline Execution Failure</h4>
-        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 8px;">The load test pipeline was aborted before AI diagnostics could be generated. Error details:</p>
-        <pre style="background: #090d16; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.82rem; color: #fca5a5; white-space: pre-wrap; font-family: monospace;">${escapeHtml(run.error_message || "Unknown execution error occurred.")}</pre>
-      </div>
-    `;
-  } else {
-    reportBody.innerHTML = `<div style="color: #94a3b8; font-style: italic; padding: 12px 0;">Report generation in progress...</div>`;
+  const reportBody = document.getElementById("ai-report-body") || document.getElementById("report-content");
+  if (reportBody) {
+    if (run.ai_report && window.marked) {
+      reportBody.innerHTML = marked.parse(run.ai_report);
+    } else if (isPipelineFailure) {
+      reportBody.innerHTML = `
+        <div class="pipeline-error-box" style="background: rgba(239, 68, 68, 0.06); border-left: 4px solid #ef4444; padding: 16px; border-radius: 4px;">
+          <h4 style="color: #ef4444; margin-top: 0; margin-bottom: 8px;">Pipeline Execution Failure</h4>
+          <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 8px;">The load test pipeline was aborted before AI diagnostics could be generated. Error details:</p>
+          <pre style="background: #090d16; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.82rem; color: #fca5a5; white-space: pre-wrap; font-family: monospace;">${escapeHtml(run.error_message || "Unknown execution error occurred.")}</pre>
+        </div>
+      `;
+    } else {
+      reportBody.innerHTML = `<div style="color: #94a3b8; font-style: italic; padding: 12px 0;">Report generation in progress...</div>`;
+    }
   }
 
   // Script preview
-  if (run.script) {
+  if (run.script && scriptCodeBlock) {
     scriptCodeBlock.textContent = run.script;
   }
 
-  if (shouldScroll) {
+  if (shouldScroll && resultsSection) {
     resultsSection.scrollIntoView({ behavior: 'smooth' });
   }
 }

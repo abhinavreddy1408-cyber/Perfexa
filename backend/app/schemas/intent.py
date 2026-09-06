@@ -4,12 +4,24 @@ This schema is central to the platform and MUST remain stable across all steps.
 """
 
 from typing import List, Dict, Any, Optional, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class RampStage(BaseModel):
     duration: str = Field(..., description="Duration for this stage, e.g., '10s', '1m', '30s'")
     target_vus: int = Field(..., ge=0, description="Target virtual users at the end of this stage")
+
+    @field_validator("duration", mode="before")
+    @classmethod
+    def sanitize_duration(cls, v: Any) -> str:
+        if isinstance(v, (int, float)):
+            return f"{int(v)}s"
+        if isinstance(v, str):
+            v_clean = v.strip().lower()
+            if v_clean.isdigit():
+                return f"{v_clean}s"
+            return v_clean
+        return "10s"
 
 
 class EndpointConfig(BaseModel):
@@ -33,6 +45,21 @@ class EndpointConfig(BaseModel):
         description="Traffic weight distribution if multiple endpoints are specified"
     )
 
+    @field_validator("weight", mode="before")
+    @classmethod
+    def sanitize_weight(cls, v: Any) -> int:
+        if v is None:
+            return 100
+        try:
+            val = float(v)
+            if val > 100 and val <= 1000:
+                val = val / 10.0
+            elif val > 1000:
+                val = 100.0
+            return max(1, min(100, int(round(val))))
+        except Exception:
+            return 100
+
 
 class SuccessCriteria(BaseModel):
     p95_ms: int = Field(
@@ -51,6 +78,19 @@ class SuccessCriteria(BaseModel):
         gt=0,
         description="Maximum acceptable 99th percentile response time in milliseconds"
     )
+
+    @field_validator("max_error_rate", mode="before")
+    @classmethod
+    def sanitize_max_error_rate(cls, v: Any) -> float:
+        if v is None:
+            return 0.01
+        try:
+            val = float(v)
+            if val > 1.0 and val <= 100.0:
+                val = val / 100.0
+            return max(0.0, min(1.0, val))
+        except Exception:
+            return 0.01
 
 
 class TestIntent(BaseModel):

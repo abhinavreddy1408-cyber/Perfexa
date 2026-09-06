@@ -129,6 +129,29 @@ def extract_intent_and_payloads(
     if isinstance(data, dict) and "error" in data:
         raise ValueError(str(data["error"]))
 
+    # Pre-sanitize and scale endpoint weights if needed
+    if isinstance(data, dict):
+        intent_dict = data.get("intent")
+        if isinstance(intent_dict, dict):
+            eps = intent_dict.get("endpoints_involved")
+            if isinstance(eps, list) and eps:
+                raw_weights = []
+                for ep in eps:
+                    if isinstance(ep, dict):
+                        try:
+                            raw_weights.append(float(ep.get("weight", 100)))
+                        except Exception:
+                            raw_weights.append(100.0)
+                max_w = max(raw_weights) if raw_weights else 100
+                scale = (100.0 / max_w) if max_w > 100 else 1.0
+                for ep in eps:
+                    if isinstance(ep, dict) and "weight" in ep:
+                        try:
+                            w = float(ep.get("weight", 100))
+                            ep["weight"] = max(1, min(100, int(round(w * scale))))
+                        except Exception:
+                            ep["weight"] = 100
+
     # Validate against Pydantic schema
     try:
         parsed = MergedIntentPayloadResponse.model_validate(data)

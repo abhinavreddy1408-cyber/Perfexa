@@ -699,20 +699,23 @@
 
       <!-- Section 3: Live Telemetry Waveforms (Streaming Charts) -->
       <section id="live-dashboard-section" class="card dashboard-section hidden rounded-xl bg-[#120f16]/85 backdrop-blur-xl border border-[#f7a8a0]/25 p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-        <div class="section-header flex items-center justify-between gap-4 mb-4 pb-4 border-b border-[#f7a8a0]/15">
+        <div class="section-header flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-[#f7a8a0]/15">
           <div class="flex items-center gap-3">
             <div class="status-indicator live relative flex h-3 w-3">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
             </div>
             <span id="run-status-text" class="font-display font-bold text-sm tracking-wider uppercase text-emerald-400">RUNNING LOAD TEST</span>
+            <span id="run-id-display" class="font-mono text-[11px] text-[#baaab4] bg-black/40 px-2 py-0.5 rounded border border-[#f7a8a0]/20">run_id: -</span>
           </div>
-          <div class="live-stats-bar flex items-center gap-3 sm:gap-5 text-xs">
-            <div class="stat-item"><span class="stat-label text-[#a595a0]">RPS:</span> <strong id="live-stat-rps" class="stat-val font-mono text-white">0</strong></div>
-            <div class="stat-item"><span class="stat-label text-[#a595a0]">p95:</span> <strong id="live-stat-p95" class="stat-val font-mono text-[#ffd1cc]">0ms</strong></div>
+          <div class="live-stats-bar flex flex-wrap items-center gap-3 sm:gap-5 text-xs">
+            <div class="stat-item"><span class="stat-label text-[#a595a0]">VUs:</span> <strong id="stat-vus" class="stat-val font-mono text-white">0</strong></div>
+            <div class="stat-item"><span class="stat-label text-[#a595a0]">RPS:</span> <strong id="stat-rps" class="stat-val font-mono text-white">0</strong></div>
+            <div class="stat-item"><span class="stat-label text-[#a595a0]">p95:</span> <strong id="stat-p95" class="stat-val font-mono text-[#ffd1cc]">0ms</strong></div>
             <div class="stat-item"><span class="stat-label text-[#a595a0]">p50:</span> <strong id="live-stat-p50" class="stat-val font-mono text-[#faeade]">0ms</strong></div>
-            <div class="stat-item"><span class="stat-label text-[#a595a0]">Errors:</span> <strong id="live-stat-errors" class="stat-val font-mono text-red-400">0%</strong></div>
-            <div class="stat-item"><span class="stat-label text-[#a595a0]">Elapsed:</span> <strong id="live-stat-elapsed" class="stat-val font-mono text-white">0s</strong></div>
+            <div class="stat-item"><span class="stat-label text-[#a595a0]">Errors:</span> <strong id="stat-error-rate" class="stat-val font-mono text-red-400">0%</strong></div>
+            <div class="stat-item"><span class="stat-label text-[#a595a0]">Elapsed:</span> <strong id="live-elapsed" class="stat-val font-mono text-white">0s</strong></div>
+            <div class="stat-item hidden sm:block"><span id="stat-failed-count" class="text-[11px] text-[#a595a0]">0 failed</span></div>
           </div>
         </div>
 
@@ -741,7 +744,7 @@
           </div>
         </div>
 
-        <div class="scorecard-grid grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+        <div id="scorecard-grid" class="scorecard-grid grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
           <div class="stat-card p-3 rounded-lg bg-[#161217]/80 border border-[#e8d5b5]/25">
             <span class="stat-label text-[11px] text-[#a595a0]">p95 Latency</span>
             <div class="stat-value font-mono font-bold text-white text-lg mt-0.5" id="summary-stat-p95">0ms</div>
@@ -762,7 +765,7 @@
 
         <div class="report-container p-5 rounded-xl bg-[#17121b]/90 border border-[#f7a8a0]/20">
           <h3 class="font-display font-semibold text-sm text-[#ffd1cc] tracking-wide uppercase mb-3">Post-Run Root Cause Diagnostic</h3>
-          <div id="report-content" class="markdown-body text-xs text-[#e0e2ed] leading-relaxed"></div>
+          <div id="ai-report-body" class="markdown-body text-xs text-[#e0e2ed] leading-relaxed"></div>
         </div>
       </section>
 
