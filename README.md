@@ -1,4 +1,11 @@
-# AutoPerf: AI-Powered Autonomous Performance Testing Platform
+# Perfexa (AutoPerf): AI-Powered Autonomous Performance Testing Platform
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg?logo=python)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![k6](https://img.shields.io/badge/Engine-Grafana%20k6-7D64FF.svg?logo=k6)](https://k6.io/)
+[![Firebase](https://img.shields.io/badge/Firebase-Hosting%20%26%20Firestore-FFA611.svg?logo=firebase)](https://firebase.google.com/)
+
 
 AutoPerf is an autonomous, end-to-end performance engineering platform that translates natural-language test prompts into structured test intent, generates realistic synthetic payloads, synthesizes verified k6 load-testing scripts, executes real load tests, streams telemetry to a live dashboard, and diagnoses system bottlenecks using AI-driven root-cause analysis.
 
@@ -128,3 +135,16 @@ python tests/test_step12_e2e_all_types.py
    * On Windows hosts, `localhost` can occasionally resolve to IPv6 `[::1]`, while local Python servers bind to IPv4 (`127.0.0.1`). The platform automatically normalizes all local host references to explicit IPv4 loopback (`http://127.0.0.1:8001`) to eliminate connection latency.
 4. **Offline Demo Fallback**:
    * Complete pre-recorded run artifacts are saved in `fixtures/` (`sample_intent.json`, `sample_payloads.json`, `sample_script.js`, `sample_results.json`, `sample_summary.md`), ensuring full demonstration capability even in network-isolated environments.
+
+---
+
+## 📄 License
+
+Distributed under the [MIT License](LICENSE).
+
+---
+
+## 📬 Contact
+
+**Abhinav Reddy** — [@abhinavreddy1408-cyber](https://github.com/abhinavreddy1408-cyber)  
+Project Link: [https://github.com/abhinavreddy1408-cyber/Perfexa](https://github.com/abhinavreddy1408-cyber/Perfexa)
